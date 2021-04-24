@@ -7,7 +7,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "Workout guide",
       home: AuthScreen(),
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+        accentColor: Colors.deepOrange,
+      ),
     );
   }
 }
