@@ -100,9 +100,9 @@ final workouts = [
         reps: 20,
       ),
     ],
-    dateTime: DateTime.now(),
+    dateTime: DateTime(2021, 5, 20, 13, 30),
     approxDuration: Duration(
-      minutes: 10,
+      minutes: 70,
     ),
     workoutType: WorkoutType.Mixed,
     difficulty: Difficulty.Easy,

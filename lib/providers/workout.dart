@@ -35,4 +35,26 @@ class Workout with ChangeNotifier {
     @required this.difficulty,
     this.isFinished = false,
   });
+
+  String get approxDurationString {
+    if (approxDuration == null) {
+      return "Duration not provided";
+    }
+    int hours = approxDuration.inHours;
+    int mins = approxDuration.inMinutes;
+
+    if (hours > 0) {
+      if (approxDuration.inMinutes > 0) {
+        return "${hours}h ${mins}m";
+      } else {
+        return "${hours}h";
+      }
+    } else {
+      if (mins > 0) {
+        return "${mins}min";
+      } else {
+        return "Duration not provided";
+      }
+    }
+  }
 }
