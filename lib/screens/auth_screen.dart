@@ -136,12 +136,12 @@ class _FormContainerState extends State<FormContainer>
 
     try {
       if (_authType == AuthType.Login) {
-        await Provider.of<Auth>(context).login(
+        await Provider.of<Auth>(context, listen: false).login(
           _authData["email"],
           _authData["password"],
         );
       } else {
-        await Provider.of<Auth>(context).signup(
+        await Provider.of<Auth>(context, listen: false).signup(
           _authData["email"],
           _authData["password"],
         );
@@ -163,6 +163,7 @@ class _FormContainerState extends State<FormContainer>
 
       _showErrorDialog(errMsg);
     } catch (error) {
+      print(error);
       const errMsg = "Couldn't authenticate";
       _showErrorDialog(errMsg);
     }
@@ -222,6 +223,7 @@ class _FormContainerState extends State<FormContainer>
                         ? "Email format incorrect"
                         : null;
                   },
+                  onSaved: (value) => _authData["email"] = value,
                   style: TextStyle(color: Colors.white),
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
@@ -240,6 +242,7 @@ class _FormContainerState extends State<FormContainer>
                         ? "password should have atleast 6 characters!"
                         : null;
                   },
+                  onSaved: (value) => _authData["password"] = value,
                   controller: _passwordController,
                   obscureText: true,
                   style: TextStyle(color: Colors.white),

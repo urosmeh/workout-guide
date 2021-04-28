@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/screens/auth_screen.dart';
+import 'package:workout_guide/screens/workouts_screen.dart';
 
 import 'providers/auth.dart';
 
@@ -23,7 +24,19 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.pink,
               accentColor: Colors.deepOrange,
             ),
-            home: auth.isAuth ? Scaffold(body: Center(child: Text("Auth works"),),) : AuthScreen(),
+            home: auth.isAuth
+                ? WorkoutsScreen()
+                : FutureBuilder(
+                    future: auth.autoLogin(),
+                    builder: (ctx, authRes) =>
+                        authRes.connectionState == ConnectionState.waiting
+                            ? Scaffold(
+                                body: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                            : AuthScreen(),
+                  ),
           );
         },
       ),
