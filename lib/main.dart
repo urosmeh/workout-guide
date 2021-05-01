@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/screens/auth_screen.dart';
+import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/screens/workouts_screen.dart';
 
 import 'providers/auth.dart';
@@ -37,6 +38,11 @@ class MyApp extends StatelessWidget {
                               )
                             : AuthScreen(),
                   ),
+            routes: {
+              EditWorkoutScreen.route: (ctx) => EditWorkoutScreen(),
+              WorkoutsScreen.route: (ctx) => WorkoutsScreen(),
+              AuthScreen.route: (ctx) => AuthScreen(),
+            },
           );
         },
       ),

@@ -291,6 +291,7 @@ class _FormContainerState extends State<FormContainer>
                                 if (value != _passwordController.text) {
                                   return 'Passwords do not match!';
                                 }
+                                return null;
                               }
                             : null,
                       ),

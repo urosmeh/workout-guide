@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:workout_guide/models/test_data.dart';
+import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/widgets/workouts_list.dart';
 
 class WorkoutsScreen extends StatelessWidget {
+  static const route = "/workouts";
+
   @override
   Widget build(BuildContext context) {
     // final appBar = AppBar(
@@ -16,7 +19,7 @@ class WorkoutsScreen extends StatelessWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () => Navigator.of(context).pushNamed(EditWorkoutScreen.route),
       ),
       // body: Container(
       //   height: MediaQuery.of(context).size.height -
@@ -32,6 +35,7 @@ class WorkoutsScreen extends StatelessWidget {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) => WorkoutsList(
+                id: _workouts[index].id,
                 title: _workouts[index].title,
                 datetime: _workouts[index].dateTime,
                 approxDurationString: _workouts[index].approxDurationString,

@@ -14,17 +14,19 @@ enum Difficulty {
 }
 
 class Workout with ChangeNotifier {
+  String id;
   String title;
   List<Exercise> exercises;
   DateTime dateTime;
-  String equipment;
   Duration approxDuration;
+  String equipment;
   int kcalBurned;
   WorkoutType workoutType;
   Difficulty difficulty;
   bool isFinished;
 
   Workout({
+    this.id,
     @required this.title,
     @required this.exercises,
     @required this.dateTime,

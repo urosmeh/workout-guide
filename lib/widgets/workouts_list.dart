@@ -4,6 +4,7 @@ import 'package:workout_guide/widgets/workouts_list_item.dart';
 
 
 class WorkoutsList extends StatelessWidget {
+  final id;
   final datetime;
   final title;
   final difficulty;
@@ -11,6 +12,7 @@ class WorkoutsList extends StatelessWidget {
   final approxDurationString;
 
   WorkoutsList({
+    @required this.id,
     @required this.title,
     @required this.datetime,
     @required this.difficulty,
@@ -37,6 +39,7 @@ class WorkoutsList extends StatelessWidget {
             ),
           ),
           WorkoutsListItem(
+            id: id,
             title: title,
             approxDurationString: approxDurationString,
             difficulty: difficulty,

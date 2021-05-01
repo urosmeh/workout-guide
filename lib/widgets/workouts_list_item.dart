@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:workout_guide/providers/workout.dart';
+import 'package:workout_guide/screens/edit_workout_screen.dart';
 
 enum ItemOptions { Start, Edit }
 
 class WorkoutsListItem extends StatelessWidget {
+  final id;
   final title;
   final equipment;
   final approxDurationString;
   final difficulty;
 
   WorkoutsListItem({
+    this.id,
     this.title,
     this.equipment,
     this.approxDurationString,
@@ -33,6 +36,7 @@ class WorkoutsListItem extends StatelessWidget {
     return Card(
       elevation: 5,
       child: ListTile(
+        onTap: () => Navigator.of(context).pushNamed(EditWorkoutScreen.route, arguments: id),
         title: Text(title),
         leading: Icon(
           Icons.circle,
@@ -41,7 +45,10 @@ class WorkoutsListItem extends StatelessWidget {
         subtitle: Container(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [Text(equipment), Text(approxDurationString)],
+            children: [
+              Text(equipment),
+              Text(approxDurationString),
+            ],
           ),
         ),
         trailing: PopupMenuButton(
