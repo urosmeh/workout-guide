@@ -8,5 +8,9 @@ class Workouts with ChangeNotifier {
     return _workouts;
   }
 
+  void addWorkout(Workout workout) {
+    _workouts.add(workout);
+    notifyListeners();
+  }
   //Workouts(this._workouts);
 }

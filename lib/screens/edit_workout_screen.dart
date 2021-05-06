@@ -1,5 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:workout_guide/models/exercise.dart';
+import 'package:workout_guide/models/test_data.dart';
 import 'package:workout_guide/providers/workout.dart';
+import 'package:workout_guide/widgets/dropdown_container.dart';
 
 class EditWorkoutScreen extends StatefulWidget {
   static const route = "/edit-workout";
@@ -15,14 +21,21 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
   DateTime _date;
   Difficulty _difficulty;
   String _selDifficulty;
+  WorkoutType _workoutType;
+  String _selWorkoutType;
+  List<Exercise> _exercise = [];
 
-  Map<String, dynamic> newWorkout = {
-    "title": "",
-    "approxDuration": null,
-    "dateTime": null,
-    "difficulty": null,
-    //...
-  };
+  final _form = GlobalKey<FormState>();
+
+  // Map<String, dynamic> newWorkout = {
+  //   "title": "",
+  //   "approxDuration": null,
+  //   "dateTime": null,
+  //   "difficulty": null,
+  //   //...
+  // };
+
+  bool isLoading = false;
 
   void _presentDateAndTimePicker(BuildContext context) async {
     final dt = await showDatePicker(
@@ -71,17 +84,48 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
       }
     }
 
+    void setWorkoutType(String value) {
+      if (value.isNotEmpty) {
+        setState(() {
+          _selWorkoutType = value;
+
+          if (value == "Mixed") {
+            _workoutType = WorkoutType.Mixed;
+          } else if (value == "Rep based") {
+            _workoutType = WorkoutType.RepOnly;
+          } else {
+            _workoutType = WorkoutType.TimeOnly;
+          }
+        });
+      }
+    }
+
+    void _saveForm() {
+      setState(() {
+        isLoading = true;
+      });
+
+      //check for errors
+
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit"),
       ),
-      body: Form(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Form(
           child: Container(
             padding: EdgeInsets.all(10),
             child: Column(
               children: [
                 TextFormField(
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return "Please enter title";
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.all(10),
@@ -103,7 +147,10 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                             child: Text("Select date and time"),
                           ),
                         ),
-                        Divider(),
+                        Divider(
+                          thickness: 1,
+                          color: Colors.pink.shade100,
+                        ),
                         Text("Approximate duration"),
                         Text(
                           "${_approxHours.toInt()}h ${_approxMins.toInt() * 15}min",
@@ -175,32 +222,316 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                             ],
                           ),
                         ),
-                        Divider(),
+                        Divider(
+                          thickness: 1,
+                          color: Colors.pink.shade100,
+                        ),
                         Text("Difficulty"),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          width: double.infinity,
-                          child: DropdownButton(
-                            underline: SizedBox(),
-                            value: _selDifficulty,
-                            onChanged: (value) {
-                              print(value);
-                              setDifficulty(value);
-                            },
-                            icon: Icon(Icons.arrow_drop_down_sharp),
-                            elevation: 3,
-                            isExpanded: true,
-                            hint: Text("Difficulty"),
-                            items: difficultyList
-                                .map(
-                                  (item) => DropdownMenuItem(
-                                    value: item,
-                                    child: Text(item),
-                                  ),
-                                )
-                                .toList(),
+                        DropdownContainer(
+                          hint: "Difficulty",
+                          items: difficultyList,
+                          value: _selDifficulty,
+                          onDropdownSelect: setDifficulty,
+                        ),
+                        // Container(
+                        //   padding: EdgeInsets.symmetric(horizontal: 10),
+                        //   width: double.infinity,
+                        //   child: DropdownButton(
+                        //     underline: SizedBox(),
+                        //     value: _selDifficulty,
+                        //     onChanged: (value) {
+                        //       print(value);
+                        //       setDifficulty(value);
+                        //     },
+                        //     icon: Icon(Icons.arrow_drop_down_sharp),
+                        //     elevation: 3,
+                        //     isExpanded: true,
+                        //     hint: Text("Difficulty"),
+                        //     items: difficultyList
+                        //         .map(
+                        //           (item) => DropdownMenuItem(
+                        //             value: item,
+                        //             child: Text(item),
+                        //           ),
+                        //         )
+                        //         .toList(),
+                        //   ),
+                        // ),
+                        Divider(
+                          thickness: 1,
+                          color: Colors.pink.shade100,
+                        ),
+                        Text("Workout type"),
+                        DropdownContainer(
+                          hint: "Workout type",
+                          value: _selWorkoutType,
+                          items: ["Mixed", "Rep based", "Time based"],
+                          onDropdownSelect: setWorkoutType,
+                        ),
+                        Divider(
+                          thickness: 1,
+                          color: Colors.pink.shade100,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: TextFormField(
+                            keyboardType: TextInputType.multiline,
+                            autocorrect: false,
+                            maxLines: 2,
+                            decoration: InputDecoration(
+                                labelText: "Equipment",
+                                border: OutlineInputBorder()),
                           ),
                         ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: TextButton(
+                            onPressed: () => _saveForm(),
+                            child: Text("Save and add exercises"),
+                          ),
+                        ),
+                        // Divider(
+                        //   thickness: 1,
+                        //   color: Colors.pink.shade100,
+                        // ),
+                        // Text("Exercises"),
+                        // Container(
+                        //   height: 200,
+                        //   child: ReorderableListView.builder(
+                        //     itemCount: workouts[0].exercises.length,
+                        //     clipBehavior: Clip.antiAlias,
+
+                        //     //notifier na exercise ??????
+                        //     onReorder: (oldIndex, newIndex) {
+                        //       final ex = workouts[0].exercises.removeAt(oldIndex);
+                        //       print(
+                        //           "old: ${oldIndex.toString()} new:${newIndex.toString()}");
+
+                        //       workouts[0].exercises.insert(newIndex, ex);
+                        //     },
+                        //     buildDefaultDragHandles: true,
+                        //     scrollDirection: Axis.horizontal,
+                        //     itemBuilder: (context, index) {
+                        //       return Container(
+                        //         key: ValueKey(index),
+                        //         width: 200,
+                        //         child: Card(
+                        //           clipBehavior: Clip.antiAlias,
+                        //           elevation: 5,
+                        //           child: Center(
+                        //             child: Column(
+                        //               children: [
+                        //                 Flexible(
+                        //                   fit: FlexFit.tight,
+                        //                   flex: 1,
+                        //                   child: Stack(
+                        //                     children: [
+                        //                       Container(
+                        //                         decoration: BoxDecoration(
+                        //                           gradient: LinearGradient(
+                        //                             colors: [
+                        //                               Colors.orange[200],
+                        //                               Colors.orange[700],
+                        //                             ],
+                        //                           ),
+                        //                         ),
+                        //                       ),
+                        //                       Center(
+                        //                         child: Text(
+                        //                             "ID: ${workouts[0].exercises[index].id} Exercise ${workouts[0].exercises[index].title}"),
+                        //                       ),
+                        //                     ],
+                        //                   ),
+                        //                 ),
+                        //                 Flexible(
+                        //                   fit: FlexFit.tight,
+                        //                   flex: 2,
+                        //                   child: Center(
+                        //                     child: SingleChildScrollView(
+                        //                       padding: EdgeInsets.all(10),
+                        //                       child: Text(
+                        //                         "${workouts[0].exercises[index].description}",
+                        //                         textAlign: TextAlign.center,
+                        //                         //maxLines: 4,
+                        //                       ),
+                        //                     ),
+                        //                   ),
+                        //                 ),
+                        //                 Flexible(
+                        //                   fit: FlexFit.tight,
+                        //                   flex: 1,
+                        //                   child: Center(
+                        //                     child: Row(
+                        //                       mainAxisAlignment:
+                        //                           MainAxisAlignment.center,
+                        //                       children: [
+                        //                         ExerciseType.RepBased ==
+                        //                                 workouts[0]
+                        //                                     .exercises[index]
+                        //                                     .type
+                        //                             ? Text(workouts[0]
+                        //                                 .exercises[index]
+                        //                                 .reps
+                        //                                 .toString())
+                        //                             : Text(workouts[0]
+                        //                                 .exercises[index]
+                        //                                 .duration
+                        //                                 .toString())
+                        //                       ],
+                        //                     ),
+                        //                   ),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       );
+                        //     },
+                        // children: [
+                        //   for (final ex in workouts[0].exercises)
+                        //     Container(
+                        //         key: ValueKey(Random(10)),
+                        //         width: 200,
+                        //       child: Card(
+                        //         clipBehavior: Clip.antiAlias,
+                        //         elevation: 5,
+                        //         child: Center(
+                        //           child: Column(
+                        //             children: [
+                        //               Flexible(
+                        //                 fit: FlexFit.tight,
+                        //                 flex: 1,
+                        //                 child: Stack(
+                        //                   children: [
+                        //                     Container(
+                        //                       decoration: BoxDecoration(
+                        //                         gradient: LinearGradient(
+                        //                           colors: [
+                        //                             Colors.orange[200],
+                        //                             Colors.orange[700],
+                        //                           ],
+                        //                         ),
+                        //                       ),
+                        //                     ),
+                        //                     Center(
+                        //                       child: Text("Exercise ${ex.title}"),
+                        //                     ),
+                        //                   ],
+                        //                 ),
+                        //               ),
+                        //               Flexible(
+                        //                 fit: FlexFit.tight,
+                        //                 flex: 2,
+                        //                 child: Center(
+                        //                   child: SingleChildScrollView(
+                        //                     padding: EdgeInsets.all(10),
+                        //                     child: Text(
+                        //                       "${ex.description}",
+                        //                       textAlign: TextAlign.center,
+                        //                       //maxLines: 4,
+                        //                     ),
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //               Flexible(
+                        //                 fit: FlexFit.tight,
+                        //                 flex: 1,
+                        //                 child: Center(
+                        //                   child: Row(
+                        //                     mainAxisAlignment:
+                        //                         MainAxisAlignment.center,
+                        //                     children: [
+                        //                       ExerciseType.RepBased == ex.type ? Text(ex.reps.toString()) : Text(ex.duration.toString())
+                        //                     ],
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //             ],
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        // ],
+                        //   ),
+                        // ),
+                        // Container(
+                        //   //padding: EdgeInsets.symmetric(horizontal: 10),
+                        //   height: 200,
+                        //   child: GridView.builder(
+                        //     gridDelegate:
+                        //         SliverGridDelegateWithFixedCrossAxisCount(
+                        //       mainAxisSpacing: 5,
+                        //       crossAxisCount: 1,
+                        //     ),
+                        //     scrollDirection: Axis.horizontal,
+                        //     addRepaintBoundaries: true,
+                        //     // itemCount: _exercise.length,
+                        //     itemCount: 10,
+                        //     itemBuilder: (context, index) => Card(
+                        //       clipBehavior: Clip.antiAlias,
+                        //       elevation: 5,
+                        //       child: Center(
+                        //         child: Column(
+                        //           children: [
+                        //             Flexible(
+                        //               fit: FlexFit.tight,
+                        //               flex: 1,
+                        //               child: Stack(
+                        //                 children: [
+                        //                   Container(
+                        //                     decoration: BoxDecoration(
+                        //                       gradient: LinearGradient(
+                        //                         colors: [
+                        //                           Colors.orange[200],
+                        //                           Colors.orange[700],
+                        //                         ],
+                        //                       ),
+                        //                     ),
+                        //                   ),
+                        //                   Center(
+                        //                     child: Text("Exercise $index"),
+                        //                   ),
+                        //                 ],
+                        //               ),
+                        //             ),
+                        //             Flexible(
+                        //               fit: FlexFit.tight,
+                        //               flex: 2,
+                        //               child: Center(
+                        //                 child: SingleChildScrollView(
+                        //                   padding: EdgeInsets.all(10),
+                        //                   child: Text(
+                        //                     "$index This will be a description long  saasdfsdfasdfasdfadsfasdfsff saasdfsdfasdfasdfadsfasdfsffsaasdfsdfasdfasdfadsfasdfsffsaasdfsdfasdfasdfadsfasdfsffsaasdfsdfasdfasdfadsfasdfsffsaasdfsdfasdfasdfadsfasdfsffsaasdfsdfasdfasdfadsfasdfsff",
+                        //                     textAlign: TextAlign.center,
+                        //                     //maxLines: 4,
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //             Flexible(
+                        //               fit: FlexFit.tight,
+                        //               flex: 1,
+                        //               child: Center(
+                        //                 child: Row(
+                        //                   mainAxisAlignment:
+                        //                       MainAxisAlignment.center,
+                        //                   children: [
+                        //                     index % 2 == 0
+                        //                         ? Text(
+                        //                             "1h30min",
+                        //                           )
+                        //                         : Text("30x"),
+                        //                   ],
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
