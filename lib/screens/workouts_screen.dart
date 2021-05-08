@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:workout_guide/models/test_data.dart';
+import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/widgets/workouts_list.dart';
 
@@ -12,7 +14,8 @@ class WorkoutsScreen extends StatelessWidget {
     //   title: const Text("Upcoming"),
     //   centerTitle: true,
     // );
-    final _workouts = workouts;
+    final _workoutsData = Provider.of<Workouts>(context);
+    final _workouts = _workoutsData.workouts;
 
     return Scaffold(
       //appBar: appBar,

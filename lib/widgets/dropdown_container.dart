@@ -13,11 +13,13 @@ class DropdownContainer extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
       width: double.infinity,
-      child: DropdownButton(
+      child: DropdownButtonFormField(
         dropdownColor: Colors.grey.shade100.withOpacity(.9),
         style: TextStyle(color: Colors.pink),
-        underline: SizedBox(),
+        //underline: SizedBox(),
         value: value,
+        validator: (value) => value == null ? "Value required" : null,
+        //onSaved: ,
         onChanged: (String val) {
           print(val);
           onDropdownSelect(val);

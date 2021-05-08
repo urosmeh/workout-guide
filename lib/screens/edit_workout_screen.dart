@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:workout_guide/models/exercise.dart';
-import 'package:workout_guide/models/test_data.dart';
 import 'package:workout_guide/providers/workout.dart';
+import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/widgets/dropdown_container.dart';
 
 class EditWorkoutScreen extends StatefulWidget {
@@ -17,13 +16,18 @@ class EditWorkoutScreen extends StatefulWidget {
 class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
   double _approxHours = 0;
   double _approxMins = 0;
-  Duration _approxDuration; //convert approx hours and mins to duration onsave
-  DateTime _date;
+  Duration _approxDuration = Duration(
+    hours: 0,
+    minutes: 0,
+  ); //convert approx hours and mins to duration onsave
+  var _date;
   Difficulty _difficulty;
   String _selDifficulty;
   WorkoutType _workoutType;
   String _selWorkoutType;
-  List<Exercise> _exercise = [];
+  List<Exercise> _exercises = [];
+  String _equipment;
+  String _title;
 
   final _form = GlobalKey<FormState>();
 
@@ -100,13 +104,81 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
       }
     }
 
-    void _saveForm() {
+    void _saveForm(BuildContext context) async {
+      print("save form");
       setState(() {
         isLoading = true;
+        _approxDuration =
+            Duration(hours: _approxHours.toInt(), minutes: _approxMins.toInt());
       });
 
-      //check for errors
+      List<String> errors = [];
 
+      if (_date == null) {
+        errors.add("Date");
+      }
+
+      if (_difficulty == null) {
+        errors.add("Difficulty");
+      }
+
+      if (_workoutType == null) {
+        errors.add("Workout type");
+      }
+
+      if (_approxDuration.inHours == 0 && _approxDuration.inMinutes == 0) {
+        errors.add("Approximate duration");
+      }
+
+      if (errors.length > 0) {
+        await showDialog<Null>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text("Check following fields"),
+            actions: [
+              TextButton(
+                onPressed: Navigator.of(context).pop,
+                child: Text("Close"),
+              )
+            ],
+            content: Container(
+              height: 200,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: errors.map((err) => Text("- $err")).toList(),
+              ),
+            ),
+          ),
+        );
+      } else {
+        final isFormValid = _form.currentState.validate();
+        if (isFormValid) {
+          _form.currentState.save();
+          Workout workout = Workout(
+            dateTime: _date,
+            difficulty: _difficulty,
+            id: DateTime.now().toString(),
+            approxDuration: _approxDuration,
+            equipment: _equipment,
+            title: _title,
+            workoutType: _workoutType,
+          );
+          Provider.of<Workouts>(context, listen: false).addWorkout(workout);
+        }
+      }
+
+      // check for errors
+      // String id;
+      // String title; Validated in form
+      // List<Exercise> exercises; is going to be added later
+      // DateTime dateTime; _date
+      // Duration approxDuration; _approxDuration
+      // String equipment; Validation not needed, can be null
+      // int kcalBurned; added after workout
+      // WorkoutType workoutType; shouldn't be null
+      // Difficulty difficulty; shouldn't be null
+      // bool isFinished; after workout is done
     }
 
     return Scaffold(
@@ -115,11 +187,13 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
       ),
       body: SingleChildScrollView(
         child: Form(
+          key: _form,
           child: Container(
             padding: EdgeInsets.all(10),
             child: Column(
               children: [
                 TextFormField(
+                  onSaved: (value) => _title = value,
                   validator: (value) {
                     if (value.isEmpty) {
                       return "Please enter title";
@@ -142,9 +216,25 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: () => _presentDateAndTimePicker(context),
-                            child: Text("Select date and time"),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 10),
+                              ),
+                              if (_date != null)
+                                Text(
+                                  "${DateFormat("EEEE - HH:mm").format(_date)}",
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                              OutlinedButton(
+                                onPressed: () =>
+                                    _presentDateAndTimePicker(context),
+                                child: Text("Select date and time"),
+                              ),
+                            ],
                           ),
                         ),
                         Divider(
@@ -275,6 +365,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                         Padding(
                           padding: const EdgeInsets.all(10),
                           child: TextFormField(
+                            onSaved: (value) => _equipment = value,
                             keyboardType: TextInputType.multiline,
                             autocorrect: false,
                             maxLines: 2,
@@ -287,7 +378,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                           padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                           alignment: AlignmentDirectional.centerEnd,
                           child: TextButton(
-                            onPressed: () => _saveForm(),
+                            onPressed: () => _saveForm(context),
                             child: Text("Save and add exercises"),
                           ),
                         ),

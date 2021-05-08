@@ -28,7 +28,7 @@ class Workout with ChangeNotifier {
   Workout({
     this.id,
     @required this.title,
-    @required this.exercises,
+    this.exercises,
     @required this.dateTime,
     this.equipment = "No equipment needed",
     this.approxDuration,
