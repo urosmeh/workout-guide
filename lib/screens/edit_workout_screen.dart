@@ -104,7 +104,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
       }
     }
 
-    void _saveForm(BuildContext context) async {
+    Future<void> _saveForm(BuildContext context) async {
       print("save form");
       setState(() {
         isLoading = true;
@@ -164,7 +164,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
             title: _title,
             workoutType: _workoutType,
           );
-          Provider.of<Workouts>(context, listen: false).addWorkout(workout);
+          await Provider.of<Workouts>(context, listen: false).addWorkout(workout);
         }
       }
 

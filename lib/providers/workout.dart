@@ -38,6 +38,24 @@ class Workout with ChangeNotifier {
     this.isFinished = false,
   });
 
+  String get workoutTypeString {
+    if (this.workoutType == WorkoutType.Mixed) {
+      return "Mixed";
+    } else if (this.workoutType == WorkoutType.RepOnly) {
+      return "RepOnly";
+    } else
+      return "TimeOnly";
+  }
+
+  String get difficultyString {
+    if (this.difficulty == Difficulty.Easy) {
+      return "Easy";
+    } else if (this.difficulty == Difficulty.Medium) {
+      return "Medium";
+    } else
+      return "Hard";
+  }
+
   String get approxDurationString {
     if (approxDuration == null) {
       return "Duration not provided";

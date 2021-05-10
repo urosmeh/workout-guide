@@ -17,7 +17,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (ctx) => Auth(),
         ),
-        ChangeNotifierProvider(create: (ctx) => Workouts()),
+        ChangeNotifierProxyProvider<Auth, Workouts>(
+          update: (ctx, auth, previousWorkouts) => Workouts(
+              auth.token,
+              auth.userId,
+              previousWorkouts == null ? [] : previousWorkouts.workouts),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, child) {
