@@ -109,7 +109,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
       setState(() {
         isLoading = true;
         _approxDuration =
-            Duration(hours: _approxHours.toInt(), minutes: _approxMins.toInt());
+            Duration(hours: _approxHours.toInt(), minutes: _approxMins.toInt() * 15);
       });
 
       List<String> errors = [];

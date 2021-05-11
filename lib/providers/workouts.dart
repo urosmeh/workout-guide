@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:workout_guide/db_urls.dart';
 import 'package:workout_guide/models/exercise.dart';
+import 'package:workout_guide/models/http_exception.dart';
+import 'package:workout_guide/models/test_data.dart';
 import 'workout.dart';
 import 'package:http/http.dart' as http;
 
@@ -122,15 +124,40 @@ class Workouts with ChangeNotifier {
     return _workouts;
   }
 
-  Map<String, int> durationHelper (Duration d){
+  Difficulty getDiffFromString(String diff) {
+    if (diff == "Easy") {
+      return Difficulty.Easy;
+    } else if (diff == "Medium") {
+      return Difficulty.Medium;
+    } else {
+      return Difficulty.Hard;
+    }
+  }
+
+  WorkoutType getWTFromString(String wt) {
+    if (wt == "RepOnly") {
+      return WorkoutType.RepOnly;
+    } else if (wt == "TimeOnly") {
+      return WorkoutType.TimeOnly;
+    } else {
+      return WorkoutType.Mixed;
+    }
+  }
+
+  Map<String, int> durationHelper(Duration d) {
     int mins = d.inMinutes;
     int hoursOnly = mins ~/ 60;
     int minsOnly = mins - hoursOnly * 60;
 
-    return {
-      "minutes": minsOnly,
-      "hours": hoursOnly
-    };
+    return {"minutes": minsOnly, "hours": hoursOnly};
+  }
+
+  ExerciseType getETFromString(String et) {
+    if (et == ExerciseType.RepBased) {
+      return ExerciseType.RepBased;
+    } else {
+      return ExerciseType.TimeBased;
+    }
   }
 
   Future<void> addWorkout(Workout workout) async {
@@ -148,12 +175,88 @@ class Workouts with ChangeNotifier {
         "workoutType": workout.workoutTypeString,
         "difficulty": workout.difficultyString,
         "isFinished": false,
+        "userCreated": userId,
       }),
     );
     print(response.body);
     workout.id = json.decode(response.body)["name"];
     _workouts.add(workout);
     notifyListeners();
+  }
+
+  Future<void> removeWorkout(String id) async {
+    final url = Uri.parse("${FIREBASE_URL}workouts/$id.json?auth=$authToken");
+    var existingIndex = _workouts.indexWhere((workout) => workout.id == id);
+    var existingWorkout = _workouts[existingIndex];
+
+    _workouts.removeAt(existingIndex);
+    notifyListeners();
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      //on error, reinsert
+      _workouts.insert(existingIndex, existingWorkout);
+      notifyListeners();
+      throw HttpException("Couldn't delete workout");
+    } else {
+      existingWorkout = null;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getAndSetWorkouts() async {
+    final filterString = 'orderBy="userCreated"&equalTo="$userId"';
+    final url =
+        Uri.parse("${FIREBASE_URL}workouts.json?auth=$authToken&$filterString");
+
+    try {
+      final response = await http.get(url);
+      final rData = json.decode(response.body) as Map<String, dynamic>;
+      print(rData);
+      print("asdsadas");
+      if (rData == null) {
+        print("test");
+        return;
+      }
+
+      final List<Workout> workouts = [];
+
+      rData.forEach((id, workout) {
+        print(id + ",");
+        workouts.add(
+          Workout(
+            id: id,
+            title: workout["title"],
+            dateTime: DateTime.parse(workout["dateTime"]),
+            difficulty: getDiffFromString(workout["difficulty"]),
+            workoutType: getWTFromString(workout["workoutType"]),
+            equipment: workout["equipment"],
+            approxDuration: Duration(
+              hours: int.tryParse(json.decode(workout["approxDuration"])["hours"]),
+              minutes: int.tryParse(json.decode(workout["approxDuration"])["minutes"]),
+            ),
+            // exercises: (workout["exercices"] as List<dynamic>).map(
+            //   (exercise) => Exercise(
+            //     title: exercise["title"],
+            //     id: exercise["id"],
+            //     type: getETFromString(exercise["type"]),
+            //     description: exercise["description"],
+            //     duration: Duration(
+            //       hours: json.decode(exercise["duration"])["hours"],
+            //       minutes: json.decode(exercise["duration"])["minutes"],
+            //     ),
+            //     reps: exercise["reps"],
+            //   ),
+            // ),
+          ),
+        );
+      });
+      _workouts = workouts;
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   // void addWorkout(Workout workout) {
