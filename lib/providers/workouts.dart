@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:workout_guide/db_urls.dart';
 import 'package:workout_guide/models/exercise.dart';
 import 'package:workout_guide/models/http_exception.dart';
-import 'package:workout_guide/models/test_data.dart';
 import 'workout.dart';
 import 'package:http/http.dart' as http;
 
@@ -149,15 +148,23 @@ class Workouts with ChangeNotifier {
     int hoursOnly = mins ~/ 60;
     int minsOnly = mins - hoursOnly * 60;
 
+    print("duration obj:  ${d.toString()}");
+    print("hours:  $hoursOnly");
+    print("hours:  $minsOnly");
+
     return {"minutes": minsOnly, "hours": hoursOnly};
   }
 
   ExerciseType getETFromString(String et) {
-    if (et == ExerciseType.RepBased) {
+    if (et == "RepBased") {
       return ExerciseType.RepBased;
     } else {
       return ExerciseType.TimeBased;
     }
+  }
+
+  Workout getWorkoutById(String id) {
+    return _workouts.firstWhere((item) => item.id == id);
   }
 
   Future<void> addWorkout(Workout workout) async {
@@ -223,7 +230,9 @@ class Workouts with ChangeNotifier {
       final List<Workout> workouts = [];
 
       rData.forEach((id, workout) {
-        print(id + ",");
+        var durationMap = workout["approxDuration"] as Map<dynamic, dynamic>;
+        var duration = Duration(hours: durationMap["hours"], minutes: durationMap["minutes"]);
+
         workouts.add(
           Workout(
             id: id,
@@ -232,10 +241,7 @@ class Workouts with ChangeNotifier {
             difficulty: getDiffFromString(workout["difficulty"]),
             workoutType: getWTFromString(workout["workoutType"]),
             equipment: workout["equipment"],
-            approxDuration: Duration(
-              hours: int.tryParse(json.decode(workout["approxDuration"])["hours"]),
-              minutes: int.tryParse(json.decode(workout["approxDuration"])["minutes"]),
-            ),
+            approxDuration: duration,
             // exercises: (workout["exercices"] as List<dynamic>).map(
             //   (exercise) => Exercise(
             //     title: exercise["title"],

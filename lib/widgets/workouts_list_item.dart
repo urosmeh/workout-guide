@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/providers/workout.dart';
 import 'package:workout_guide/providers/workouts.dart';
@@ -31,6 +32,136 @@ class WorkoutsListItem extends StatelessWidget {
       return Colors.red;
     }
     return Colors.grey;
+  }
+
+  void openWorkoutModal(BuildContext context, String workoutId) {
+    Workout w =
+        Provider.of<Workouts>(context, listen: false).getWorkoutById(workoutId);
+
+    if (w != null) {
+      showModalBottomSheet(
+        // backgroundColor: Colors.white,
+        elevation: 10,
+        enableDrag: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        context: context,
+        builder: (_) {
+          return Column(
+            //mainAxisSize: MainAxisSize.min,
+//             Workout({
+//   this.id,
+//   @required this.title,
+//   this.exercises,
+//   @required this.dateTime,
+//   this.equipment = "No equipment needed",
+//   this.approxDuration,
+//   this.kcalBurned,
+//   @required this.workoutType,
+//   @required this.difficulty,
+//   this.isFinished = false,
+// });
+            children: [
+              Text(
+                w.title,
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              Text(
+                DateFormat("EEEE - HH:mm").format(w.dateTime),
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+              Divider(
+                thickness: 2,
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          "Difficulty",
+                          style: Theme.of(context).textTheme.subtitle1,
+                        ),
+                        Text(
+                          "${w.difficultyString}",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          "Type",
+                          style: Theme.of(context).textTheme.subtitle1,
+                        ),
+                        Text(
+                          "${w.workoutTypeString}",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          "Duration",
+                          style: Theme.of(context).textTheme.subtitle1,
+                        ),
+                        Text(
+                          "${w.approxDurationString}",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "Equipment",
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: Text(
+                                w.equipment.length > 50
+                                    ? w.equipment.substring(0, 50) + "..."
+                                    : w.equipment,
+                                style: Theme.of(context).textTheme.headline5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 20),
+                child: Text("TODO: List of exercises"),
+              )
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -78,6 +209,7 @@ class WorkoutsListItem extends StatelessWidget {
       child: Card(
         elevation: 5,
         child: ListTile(
+          onLongPress: () => openWorkoutModal(context, id),
           onTap: () => Navigator.of(context)
               .pushNamed(EditWorkoutScreen.route, arguments: id),
           title: Text(title),
@@ -94,21 +226,30 @@ class WorkoutsListItem extends StatelessWidget {
               ],
             ),
           ),
-          trailing: PopupMenuButton(
-            child: Icon(Icons.more_vert),
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                child: Text("Edit"),
-                value: ItemOptions.Edit,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.play_arrow),
+                onPressed: () {},
               ),
-              PopupMenuItem(
-                child: Text("Start"),
-                value: ItemOptions.Start,
+              PopupMenuButton(
+                child: Icon(Icons.more_vert),
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    child: Text("Edit"),
+                    value: ItemOptions.Edit,
+                  ),
+                  PopupMenuItem(
+                    child: Text("Start"),
+                    value: ItemOptions.Start,
+                  ),
+                ],
+                onSelected: (ItemOptions selected) {
+                  //open edit/start screen
+                },
               ),
             ],
-            onSelected: (ItemOptions selected) {
-              //open edit/start screen
-            },
           ),
         ),
       ),

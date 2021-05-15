@@ -60,21 +60,11 @@ class Workout with ChangeNotifier {
     if (approxDuration == null) {
       return "Duration not provided";
     }
-    int hours = approxDuration.inHours;
     int mins = approxDuration.inMinutes;
 
-    if (hours > 0) {
-      if (approxDuration.inMinutes > 0) {
-        return "${hours}h ${mins}m";
-      } else {
-        return "${hours}h";
-      }
-    } else {
-      if (mins > 0) {
-        return "${mins}min";
-      } else {
-        return "Duration not provided";
-      }
-    }
+    int hoursOnly = mins ~/ 60;
+    int minutesOnly = mins - hoursOnly * 60;
+
+    return "${hoursOnly}h ${minutesOnly}m";
   }
 }
