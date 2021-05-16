@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:workout_guide/db_urls.dart';
 import 'package:workout_guide/models/exercise.dart';
 import 'package:workout_guide/models/http_exception.dart';
-import 'workout.dart';
+import '../models/workout.dart';
 import 'package:http/http.dart' as http;
 
 class Workouts with ChangeNotifier {
@@ -167,10 +167,9 @@ class Workouts with ChangeNotifier {
     return _workouts.firstWhere((item) => item.id == id);
   }
 
-  Future<void> addWorkout(Workout workout) async {
-    print("addworkout");
+  Future<String> addWorkout(Workout workout) async {
     final url = Uri.parse("${FIREBASE_URL}workouts.json?auth=$authToken");
-    print(url.toString());
+
     final response = await http.post(
       url,
       body: json.encode({
@@ -183,12 +182,17 @@ class Workouts with ChangeNotifier {
         "difficulty": workout.difficultyString,
         "isFinished": false,
         "userCreated": userId,
+        "exerciseIds": [],
       }),
     );
-    print(response.body);
-    workout.id = json.decode(response.body)["name"];
+
+    var id = json.decode(response.body)["name"];
+    workout.id = id;
+
     _workouts.add(workout);
     notifyListeners();
+
+    return id;
   }
 
   Future<void> removeWorkout(String id) async {
@@ -220,10 +224,7 @@ class Workouts with ChangeNotifier {
     try {
       final response = await http.get(url);
       final rData = json.decode(response.body) as Map<String, dynamic>;
-      print(rData);
-      print("asdsadas");
       if (rData == null) {
-        print("test");
         return;
       }
 
@@ -231,7 +232,10 @@ class Workouts with ChangeNotifier {
 
       rData.forEach((id, workout) {
         var durationMap = workout["approxDuration"] as Map<dynamic, dynamic>;
-        var duration = Duration(hours: durationMap["hours"], minutes: durationMap["minutes"]);
+        var duration = Duration(
+          hours: durationMap["hours"],
+          minutes: durationMap["minutes"],
+        );
 
         workouts.add(
           Workout(

@@ -5,16 +5,16 @@ enum ExerciseType {
   TimeBased,
 }
 
-class Exercise {
+class Exercise with ChangeNotifier {
   String id;
   String title;
   String description;
   ExerciseType type;
-  var duration;
+  Duration duration;
   int reps;
 
   Exercise({
-    @required this.id,
+    this.id,
     @required this.title,
     this.description,
     @required this.type,

@@ -1,4 +1,4 @@
-import 'package:workout_guide/providers/workout.dart';
+import 'package:workout_guide/models/workout.dart';
 
 import 'exercise.dart';
 
