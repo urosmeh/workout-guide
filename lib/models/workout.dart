@@ -16,7 +16,7 @@ enum Difficulty {
 class Workout with ChangeNotifier {
   String id;
   String title;
-  List<Exercise> exercises;
+  List<String> exerciseIds;
   DateTime dateTime;
   Duration approxDuration;
   String equipment;
@@ -28,7 +28,7 @@ class Workout with ChangeNotifier {
   Workout({
     this.id,
     @required this.title,
-    this.exercises,
+    this.exerciseIds,
     @required this.dateTime,
     this.equipment = "No equipment needed",
     this.approxDuration,
@@ -66,5 +66,14 @@ class Workout with ChangeNotifier {
     int minutesOnly = mins - hoursOnly * 60;
 
     return "${hoursOnly}h ${minutesOnly}m";
+  }
+
+  void addExercise(String exerciseId) {
+    if(exerciseIds != null) {
+      exerciseIds.add(exerciseId);
+    } else {
+      exerciseIds = [exerciseId];
+    }
+    notifyListeners();
   }
 }

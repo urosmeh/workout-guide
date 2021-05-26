@@ -18,6 +18,7 @@ class DropdownContainer extends StatelessWidget {
         style: TextStyle(color: Colors.pink),
         //underline: SizedBox(),
         value: value,
+        autovalidateMode: AutovalidateMode.always,
         validator: (value) => value == null ? "Value required" : null,
         //onSaved: ,
         onChanged: (String val) {

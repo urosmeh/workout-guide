@@ -13,111 +13,7 @@ class Workouts with ChangeNotifier {
 
   Workouts(this.authToken, this.userId, this._workouts);
 
-  List<Workout> _workouts = [
-    Workout(
-        title: "Full body",
-        exercises: [
-          Exercise(
-            id: "e1",
-            title: "Run in place",
-            type: ExerciseType.TimeBased,
-            description: "Just run in place for time given",
-            duration: Duration(
-              seconds: 30,
-            ),
-          ),
-          Exercise(
-            id: "e2",
-            title: "Jumping jacks",
-            type: ExerciseType.TimeBased,
-            description:
-                "Jump with legs spread wide and hands overhead, then return in position with feet together and arms at sides",
-            duration: Duration(
-              minutes: 1,
-            ),
-          ),
-          Exercise(
-            id: "e3",
-            title: "Squats",
-            type: ExerciseType.RepBased,
-            description:
-                "Squat with flat back, knees always behind toes, to 90degrees",
-            reps: 20,
-          ),
-          Exercise(
-            id: "e4",
-            title: "Lunges",
-            type: ExerciseType.RepBased,
-            description: "Jump with crossing lets front/back, same with arms",
-            reps: 20,
-          ),
-          Exercise(
-            id: "e5",
-            title: "Burpees",
-            type: ExerciseType.RepBased,
-            description: "Squat, push-up, jump, repeat",
-            reps: 20,
-          ),
-        ],
-        dateTime: DateTime.now(),
-        approxDuration: Duration(
-          minutes: 10,
-        ),
-        workoutType: WorkoutType.Mixed,
-        difficulty: Difficulty.Hard),
-    Workout(
-        title: "Not full body",
-        exercises: [
-          Exercise(
-            id: DateTime.now().toString(),
-            title: "Run in place",
-            type: ExerciseType.TimeBased,
-            description: "Just run in place for time given",
-            duration: Duration(
-              seconds: 30,
-            ),
-          ),
-          Exercise(
-            id: DateTime.now().toString(),
-            title: "Jumping jacks",
-            type: ExerciseType.TimeBased,
-            description:
-                "Jump with legs spread wide and hands overhead, then return in position with feet together and arms at sides",
-            duration: Duration(
-              minutes: 1,
-            ),
-          ),
-          Exercise(
-            id: DateTime.now().toString(),
-            title: "Squats",
-            type: ExerciseType.RepBased,
-            description:
-                "Squat with flat back, knees always behind toes, to 90degrees",
-            reps: 20,
-          ),
-          Exercise(
-            id: DateTime.now().toString(),
-            title: "Lunges",
-            type: ExerciseType.RepBased,
-            description: "Jump with crossing lets front/back, same with arms",
-            reps: 20,
-          ),
-          Exercise(
-            id: DateTime.now().toString(),
-            title: "Burpees",
-            type: ExerciseType.RepBased,
-            description: "Squat, push-up, jump, repeat",
-            reps: 20,
-          ),
-        ],
-        dateTime: DateTime(2021, 5, 20, 13, 30),
-        approxDuration: Duration(
-          minutes: 70,
-        ),
-        workoutType: WorkoutType.Mixed,
-        difficulty: Difficulty.Easy,
-        equipment: "Dumbells, mat")
-  ];
+  List<Workout> _workouts = [];
 
   List<Workout> get workouts {
     return _workouts;
@@ -269,8 +165,50 @@ class Workouts with ChangeNotifier {
     }
   }
 
-  // void addWorkout(Workout workout) {
-  //   _workouts.add(workout);
-  //   notifyListeners();
-  // }
+  Future<bool> addExerciseToWorkout(String workoutId, String exerciseId) async {
+    if (workoutId == null) {
+      return false;
+    }
+    
+    if(workoutId.isEmpty || exerciseId.isEmpty) {
+      return false;
+    }
+
+    final url =
+        Uri.parse("${FIREBASE_URL}workouts/$workoutId.json?auth=$authToken");
+
+    final wIndex = _workouts.indexWhere((item) => workoutId == item.id);
+    var workout = _workouts[wIndex];
+    if(workout.exerciseIds == null) {
+      workout.exerciseIds = [exerciseId];
+    } else {
+      workout.exerciseIds.add(exerciseId);
+    }
+
+    try {
+      await http.patch(
+        url,
+        body: json.encode(
+          {
+            "title": workout.title,
+            "approxDuration": durationHelper(workout.approxDuration),
+            "dateTime": workout.dateTime.toIso8601String(),
+            "kcalBurned": workout.kcalBurned,
+            "equipment": workout.equipment,
+            "workoutType": workout.workoutTypeString,
+            "difficulty": workout.difficultyString,
+            "isFinished": false,
+            "userCreated": userId,
+            "exerciseIds": workout.exerciseIds,
+          },
+        ),
+      );
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+
+    notifyListeners();
+    return true;
+  }
 }

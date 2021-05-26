@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/models/workout.dart';
 import 'package:workout_guide/providers/workouts.dart';
-import 'package:workout_guide/screens/edit_wo_exercises_screen.dart';
+import 'package:workout_guide/screens/workout_exercises_screen.dart';
 import 'package:workout_guide/widgets/dropdown_container.dart';
 
 class EditWorkoutScreen extends StatefulWidget {
@@ -25,7 +25,6 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
   String _selDifficulty;
   WorkoutType _workoutType;
   String _selWorkoutType;
-  List<String> _exerciseIds = [];
   String _equipment;
   String _title;
 
@@ -97,9 +96,8 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
     }
 
     void goToExercisesScreen(BuildContext context, String id) {
-      Navigator.of(context).pushReplacementNamed(
-          EditWorkoutExercisesScreen.route,
-          arguments: id);
+      Navigator.of(context)
+          .pushReplacementNamed(WorkoutExercisesScreen.route, arguments: id);
     }
 
     Future<void> _saveForm(BuildContext context) async {
@@ -178,18 +176,6 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
           }
         }
       }
-
-      // check for errors
-      // String id;
-      // String title; Validated in form
-      // List<Exercise> exercises; is going to be added later
-      // DateTime dateTime; _date
-      // Duration approxDuration; _approxDuration
-      // String equipment; Validation not needed, can be null
-      // int kcalBurned; added after workout
-      // WorkoutType workoutType; shouldn't be null
-      // Difficulty difficulty; shouldn't be null
-      // bool isFinished; after workout is done
     }
 
     return Scaffold(
@@ -233,14 +219,13 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                                     Padding(
                                       padding: EdgeInsets.only(top: 10),
                                     ),
-                                    if (_date != null)
-                                      Text(
-                                        "${DateFormat("EEEE - HH:mm").format(_date)}",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
+                                    Text(
+                                      "${_date == null ? "Please pick date" : DateFormat("EEEE - HH:mm").format(_date)}",
+                                      style: TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
                                     OutlinedButton(
                                       onPressed: () =>
                                           _presentDateAndTimePicker(context),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:workout_guide/providers/exercises.dart';
 import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/auth_screen.dart';
-import 'package:workout_guide/screens/edit_wo_exercises_screen.dart';
+import 'package:workout_guide/screens/workout_exercises_screen.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/screens/workouts_screen.dart';
+import 'package:workout_guide/widgets/add_workout_exercise_modal.dart';
 
 import 'providers/auth.dart';
 
@@ -20,9 +22,17 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<Auth, Workouts>(
           update: (ctx, auth, previousWorkouts) => Workouts(
-              auth.token,
-              auth.userId,
-              previousWorkouts == null ? [] : previousWorkouts.workouts),
+            auth.token,
+            auth.userId,
+            previousWorkouts == null ? [] : previousWorkouts.workouts,
+          ),
+        ),
+        ChangeNotifierProxyProvider<Auth, Exercises>(
+          update: (ctx, auth, previousExercises) => Exercises(
+            auth.token,
+            auth.userId,
+            previousExercises == null ? [] : previousExercises.exercises,
+          ),
         ),
       ],
       child: Consumer<Auth>(
@@ -50,7 +60,9 @@ class MyApp extends StatelessWidget {
               EditWorkoutScreen.route: (ctx) => EditWorkoutScreen(),
               WorkoutsScreen.route: (ctx) => WorkoutsScreen(),
               AuthScreen.route: (ctx) => AuthScreen(),
-              EditWorkoutExercisesScreen.route: (ctx) => EditWorkoutExercisesScreen(),
+              WorkoutExercisesScreen.route: (ctx) =>
+                  WorkoutExercisesScreen(),
+                  //AddWorkoutExerciseModal.route: (ctx) => AddWorkoutExerciseModal(),
             },
           );
         },

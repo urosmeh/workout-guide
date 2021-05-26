@@ -28,6 +28,18 @@ class Helpers {
       return ExerciseType.TimeBased;
     }
   }
+
+  static Map<String, int> durationHelper(Duration d) {
+    int mins = d.inMinutes;
+    int hoursOnly = mins ~/ 60;
+    int minsOnly = mins - hoursOnly * 60;
+
+    print("duration obj:  ${d.toString()}");
+    print("hours:  $hoursOnly");
+    print("hours:  $minsOnly");
+
+    return {"minutes": minsOnly, "hours": hoursOnly};
+  }
 }
 
 // TODO: add helpers

@@ -5,6 +5,8 @@ import 'package:workout_guide/models/workout.dart';
 import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
 
+import 'add_workout_exercise_modal.dart';
+
 enum ItemOptions { Start, Edit }
 
 class WorkoutsListItem extends StatelessWidget {
@@ -40,7 +42,6 @@ class WorkoutsListItem extends StatelessWidget {
 
     if (w != null) {
       showModalBottomSheet(
-        // backgroundColor: Colors.white,
         elevation: 10,
         enableDrag: true,
         shape: RoundedRectangleBorder(
@@ -49,19 +50,6 @@ class WorkoutsListItem extends StatelessWidget {
         context: context,
         builder: (_) {
           return Column(
-            //mainAxisSize: MainAxisSize.min,
-//             Workout({
-//   this.id,
-//   @required this.title,
-//   this.exercises,
-//   @required this.dateTime,
-//   this.equipment = "No equipment needed",
-//   this.approxDuration,
-//   this.kcalBurned,
-//   @required this.workoutType,
-//   @required this.difficulty,
-//   this.isFinished = false,
-// });
             children: [
               Text(
                 w.title,
@@ -155,7 +143,29 @@ class WorkoutsListItem extends StatelessWidget {
               ),
               Container(
                 padding: EdgeInsets.only(top: 20),
-                child: Text("TODO: List of exercises"),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("TODO: List of exercises"),
+                    IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () async {
+                        //close modal bottom sheet
+                        Navigator.of(context).pop();
+                        await showDialog(
+                          context: context,
+                          builder: (BuildContext ctx) {
+                            print("sd: ${w.id}");
+                            //.route, arguments: w.id);
+                            return AddWorkoutExerciseModal(w.id);
+                          },
+                          barrierColor: Colors.transparent,
+                        );
+                        openWorkoutModal(context, w.id);
+                      },
+                    ),
+                  ],
+                ),
               )
             ],
           );
