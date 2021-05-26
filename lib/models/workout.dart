@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:workout_guide/models/exercise.dart';
 
 enum WorkoutType {
   RepOnly,

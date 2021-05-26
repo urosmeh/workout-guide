@@ -5,8 +5,6 @@ import 'package:workout_guide/models/workout.dart';
 import 'package:workout_guide/providers/exercises.dart';
 import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/widgets/add_workout_exercise_modal.dart';
-import 'package:workout_guide/widgets/dropdown_container.dart';
-import 'package:workout_guide/widgets/edit_exercise.dart';
 import 'package:workout_guide/widgets/exercises_list_item.dart';
 
 class WorkoutExercisesScreen extends StatefulWidget {
@@ -24,7 +22,7 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
   var _pickedExercise;
 
   Future<void> _refreshList(BuildContext context) async {
-    await Provider.of<Exercises>(context, listen: false);
+    await Provider.of<Exercises>(context, listen: false).getAndSetExercises();
     // exercises = await Provider.of<Exercises>(context, listen: false)
     //     .getExercisesByIds(workout.exerciseIds);
   }

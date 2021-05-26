@@ -6,7 +6,6 @@ import 'package:workout_guide/screens/auth_screen.dart';
 import 'package:workout_guide/screens/workout_exercises_screen.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/screens/workouts_screen.dart';
-import 'package:workout_guide/widgets/add_workout_exercise_modal.dart';
 
 import 'providers/auth.dart';
 
