@@ -41,9 +41,9 @@ class Workout with ChangeNotifier {
     if (this.workoutType == WorkoutType.Mixed) {
       return "Mixed";
     } else if (this.workoutType == WorkoutType.RepOnly) {
-      return "RepOnly";
+      return "Rep based";
     } else
-      return "TimeOnly";
+      return "Time based";
   }
 
   String get difficultyString {

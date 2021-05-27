@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/models/exercise.dart';
-import 'package:workout_guide/models/workout.dart';
 import 'package:workout_guide/providers/exercises.dart';
 import 'package:workout_guide/providers/workouts.dart';
 
@@ -38,7 +37,7 @@ class _EditExerciseState extends State<EditExercise> {
 
   @override
   Widget build(BuildContext context) {
-    Workout workout = Provider.of<Workouts>(context, listen: false).getWorkoutById(widget.workoutId);
+    //Workout workout = Provider.of<Workouts>(context, listen: false).getWorkoutById(widget.workoutId);
     const List<String> exerciseTypes = [
       "Time",
       "Reps",
@@ -83,17 +82,21 @@ class _EditExerciseState extends State<EditExercise> {
 
         final exerciseId = await Provider.of<Exercises>(context, listen: false)
             .addExercise(ex);
+        print("---------------------------------");
         print("exerciseId: $exerciseId");
+        print("workoutId: ${widget.workoutId}");
+        print("---------------------------------");
         bool status = true;
         if (exerciseId != null) {
-          workout.addExercise(exerciseId);
-          print("workout ${workout.title}: ${workout.exerciseIds.length}");
+          //workout.addExercise(exerciseId);
+          //print("workout ${workout.title}: ${workout.exerciseIds.length}");
 
-          // status = await Provider.of<Workouts>(context, listen: false)
-          //     .addExerciseToWorkout(widget.workoutId, exerciseId);
+          status = await Provider.of<Workouts>(context, listen: false)
+              .addExerciseToWorkout(widget.workoutId, exerciseId);
           print("status: $status");
         }
 
+        //TODO: replace with own widget
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Container(
@@ -109,10 +112,6 @@ class _EditExerciseState extends State<EditExercise> {
             ),
             duration: Duration(seconds: 3),
             elevation: 10,
-            // action: SnackBarAction(
-            //   label: 'Dismiss',
-            //   onPressed: () {},
-            // ),
           ),
         );
         setState(() {

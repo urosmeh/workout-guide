@@ -169,8 +169,8 @@ class Workouts with ChangeNotifier {
     if (workoutId == null) {
       return false;
     }
-    
-    if(workoutId.isEmpty || exerciseId.isEmpty) {
+
+    if (workoutId.isEmpty || exerciseId.isEmpty) {
       return false;
     }
 
@@ -179,7 +179,7 @@ class Workouts with ChangeNotifier {
 
     final wIndex = _workouts.indexWhere((item) => workoutId == item.id);
     var workout = _workouts[wIndex];
-    if(workout.exerciseIds == null) {
+    if (workout.exerciseIds == null) {
       workout.exerciseIds = [exerciseId];
     } else {
       workout.exerciseIds.add(exerciseId);
@@ -211,4 +211,40 @@ class Workouts with ChangeNotifier {
     notifyListeners();
     return true;
   }
+
+  Future<bool> updateWorkout(String workoutId, Workout workout) async {
+    final url =
+        Uri.parse("${FIREBASE_URL}workouts/$workoutId.json?auth=$authToken");
+    final workoutIndex = _workouts.indexWhere((item) => workoutId == item.id);
+
+    if (workoutIndex >= 0) {
+      //return true;
+      var response = await http.patch(
+        url,
+        body: json.encode(
+          {
+            "title": workout.title,
+            "approxDuration": durationHelper(workout.approxDuration),
+            "dateTime": workout.dateTime.toIso8601String(),
+            "kcalBurned": workout.kcalBurned ?? 0,
+            "equipment": workout.equipment,
+            "workoutType": workout.workoutTypeString,
+            "difficulty": workout.difficultyString,
+            "isFinished":
+                workout.isFinished == null ? false : workout.isFinished,
+            "userCreated": userId,
+            "exerciseIds": workout.exerciseIds,
+          },
+        ),
+      );
+      //TODO: check response!!
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // Future<void> removeExerciseById(String exId) {
+
+  // }
 }

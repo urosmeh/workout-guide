@@ -56,19 +56,28 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          Navigator.of(context).push(
-            PageRouteBuilder(
-              pageBuilder: (context, _, __) {
-                return AddWorkoutExerciseModal(workoutId);
-              },
-              settings: RouteSettings(
-                arguments: workoutId,
-              ),
-              fullscreenDialog: false,
-              opaque: false,
-              maintainState: true,
-            ),
+          showDialog(
+            context: context,
+            builder: (BuildContext ctx) {
+              print("sd: $workoutId");
+              //.route, arguments: w.id);
+              return AddWorkoutExerciseModal(workoutId);
+            },
+            barrierColor: Colors.transparent,
           );
+          // Navigator.of(context).push(
+          //   PageRouteBuilder(
+          //     pageBuilder: (context, _, __) {
+          //       return AddWorkoutExerciseModal(workoutId);
+          //     },
+          //     settings: RouteSettings(
+          //       arguments: workoutId,
+          //     ),
+          //     fullscreenDialog: false,
+          //     opaque: false,
+          //     maintainState: true,
+          //   ),
+          // );
         },
       ),
       body: FutureBuilder(
@@ -87,7 +96,7 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
                         return CustomScrollView(
                           slivers: [
                             SliverAppBar(
-                              title: Text("Upcoming"),
+                              title: Text("Exercises"),
                               centerTitle: true,
                               floating: true,
                             ),

@@ -24,6 +24,8 @@ class ExercisesListItem extends StatelessWidget {
       child: Dismissible(
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
+          //TODO: remove from workout only ?
+          // Provider<Workouts>.
           print("on dismissed");
         },
         background: Container(
@@ -64,7 +66,7 @@ class ExercisesListItem extends StatelessWidget {
         child: Card(
           elevation: 5,
           child: ListTile(
-            leading: title,
+            leading: Text(title),
           ),
         ),
       ),
