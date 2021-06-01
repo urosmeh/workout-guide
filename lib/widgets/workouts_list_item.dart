@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:workout_guide/models/workout.dart';
 import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
+import 'package:workout_guide/screens/workout_exercises_screen.dart';
 
 import 'add_workout_exercise_modal.dart';
 
@@ -15,6 +16,7 @@ class WorkoutsListItem extends StatelessWidget {
   final equipment;
   final approxDurationString;
   final difficulty;
+  final exerciseIds;
 
   WorkoutsListItem({
     this.id,
@@ -22,6 +24,7 @@ class WorkoutsListItem extends StatelessWidget {
     this.equipment,
     this.approxDurationString,
     this.difficulty,
+    this.exerciseIds,
   });
 
   MaterialColor difficultyColor(Difficulty difficulty) {
@@ -143,26 +146,37 @@ class WorkoutsListItem extends StatelessWidget {
               ),
               Container(
                 padding: EdgeInsets.only(top: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Column(
                   children: [
-                    Text("TODO: List of exercises"),
-                    IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: () async {
-                        //close modal bottom sheet
-                        Navigator.of(context).pop();
-                        await showDialog(
-                          context: context,
-                          builder: (BuildContext ctx) {
-                            print("sd: ${w.id}");
-                            //.route, arguments: w.id);
-                            return AddWorkoutExerciseModal(w.id);
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(WorkoutExercisesScreen.route, arguments: workoutId);
                           },
-                          barrierColor: Colors.transparent,
-                        );
-                        openWorkoutModal(context, w.id);
-                      },
+                          child: Container(
+                            child: Row(
+                              children: [
+                                Icon(Icons.search),
+                                Text("See exercises"),
+                              ],
+                            ),
+                          ),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {},
+                          child: Container(
+                            child: Row(
+                              children: [
+                                Icon(Icons.add),
+                                Text("Add new exercise"),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

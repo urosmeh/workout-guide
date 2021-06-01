@@ -10,6 +10,7 @@ class WorkoutsList extends StatelessWidget {
   final difficulty;
   final equipment;
   final approxDurationString;
+  final exerciseIds;
 
   WorkoutsList({
     @required this.id,
@@ -18,6 +19,7 @@ class WorkoutsList extends StatelessWidget {
     @required this.difficulty,
     @required this.equipment,
     @required this.approxDurationString,
+    @required this.exerciseIds,
   });
 
   @override
@@ -44,6 +46,7 @@ class WorkoutsList extends StatelessWidget {
             approxDurationString: approxDurationString,
             difficulty: difficulty,
             equipment: equipment,
+            exerciseIds: exerciseIds,
           ),
         ],
       ),

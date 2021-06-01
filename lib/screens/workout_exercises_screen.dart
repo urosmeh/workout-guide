@@ -20,23 +20,35 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
   List<Exercise> exercises = [];
   var _isInit = true;
   var _pickedExercise;
+  var _isLoading = false;
 
   Future<void> _refreshList(BuildContext context) async {
     await Provider.of<Exercises>(context, listen: false).getAndSetExercises();
-    // exercises = await Provider.of<Exercises>(context, listen: false)
-    //     .getExercisesByIds(workout.exerciseIds);
+    if (workout.exerciseIds != null || workout.exerciseIds.length >= 0) {
+      exercises = Provider.of<Exercises>(context, listen: false)
+          .getExercisesByIds(workout.exerciseIds);
+    }
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     if (_isInit) {
+      _isLoading = true;
       workoutId = ModalRoute.of(context).settings.arguments as String;
       if (workoutId != null) {
-        workout = Provider.of<Workouts>(context, listen: true)
+        workout = Provider.of<Workouts>(context, listen: false)
             .getWorkoutById(workoutId);
-        workout.addExercise("asdsad");
+        print(workout.exerciseIds);
+        await Provider.of<Exercises>(context, listen: false)
+            .getAndSetExercises();
+        if (workout.exerciseIds != null || workout.exerciseIds.length >= 0) {
+          exercises = Provider.of<Exercises>(context, listen: false)
+              .getExercisesByIds(workout.exerciseIds) ?? [];
+        }
       }
     }
+    _isLoading = false;
+
     _isInit = false;
     super.didChangeDependencies();
   }
@@ -65,24 +77,11 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
             },
             barrierColor: Colors.transparent,
           );
-          // Navigator.of(context).push(
-          //   PageRouteBuilder(
-          //     pageBuilder: (context, _, __) {
-          //       return AddWorkoutExerciseModal(workoutId);
-          //     },
-          //     settings: RouteSettings(
-          //       arguments: workoutId,
-          //     ),
-          //     fullscreenDialog: false,
-          //     opaque: false,
-          //     maintainState: true,
-          //   ),
-          // );
         },
       ),
       body: FutureBuilder(
         builder: (ctx, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
+            snapshot.connectionState == ConnectionState.waiting ?? _isLoading
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
@@ -92,7 +91,7 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
                     ),
                     child: Consumer<Exercises>(
                       builder: (ctx, exercisesData, child) {
-                        exercises = exercisesData.exercises ?? [];
+                        //exercises = exercisesData.exercises ?? [];
                         return CustomScrollView(
                           slivers: [
                             SliverAppBar(
@@ -121,12 +120,14 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 30),
                                       child: Center(
-                                        child: Text(
-                                          "This workout has no exercises. Try adding some!",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6,
-                                        ),
+                                        child: _isLoading
+                                            ? CircularProgressIndicator()
+                                            : Text(
+                                                "This workout has no exercises. Try adding some!",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6,
+                                              ),
                                       ),
                                     )
                                   ],

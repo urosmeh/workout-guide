@@ -53,6 +53,7 @@ class WorkoutsScreen extends StatelessWidget {
                                     workoutsData.workouts[index].difficulty,
                                 equipment:
                                     workoutsData.workouts[index].equipment,
+                                exerciseIds: workoutsData.workouts[index].exerciseIds,
                               ),
                               childCount: workoutsData.workouts.length,
                             ),

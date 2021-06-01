@@ -34,11 +34,14 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
   bool _isInit = true;
   Workout _editedObj;
   bool _isUpdate = false;
+  String workoutId;
+  ValueKey<DateTime> forceRebuild;
+  ValueKey<DateTime> forceRebuild1;
 
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      final workoutId = ModalRoute.of(context).settings.arguments as String;
+      workoutId = ModalRoute.of(context).settings.arguments as String;
       print(workoutId);
       if (workoutId != null) {
         _isUpdate = true;
@@ -50,15 +53,21 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
         _selDifficulty = _editedObj.difficultyString;
         _difficulty = _editedObj.difficulty;
 
-        //weird bug ???
         Map<String, int> durationMap =
             Helpers.durationHelper(_editedObj.approxDuration);
         if (durationMap != null) {
-          _approxHours = durationMap["hours"].toDouble() / 60;
-          _approxMins = durationMap["minutes"].toDouble() / 15;
+          setState(() {
+            _approxHours = durationMap["hours"].toDouble();
+            _approxMins = durationMap["minutes"].toDouble() / 15;
+            forceRebuild = ValueKey(DateTime.now());
+            forceRebuild1 = ValueKey(DateTime.now());
+          });
+
         } else {
+          setState(() {
           _approxHours = 0.0;
           _approxMins = 0.0;
+          });
         }
 
         _equipment = _editedObj.equipment;
@@ -204,25 +213,37 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
           Workout workout = Workout(
             dateTime: _date,
             difficulty: _difficulty,
-            id: DateTime.now().toString(),
+            id: workoutId == null ? DateTime.now().toString() : workoutId,
             approxDuration: _approxDuration,
             equipment: _equipment,
             title: _title,
             workoutType: _workoutType,
           );
           print(_isUpdate);
+          print("workoutid: ${workout.id}");
 
           if (_isUpdate) {
             //patch request
             var status = await Provider.of<Workouts>(context, listen: false)
                 .updateWorkout(workout.id, workout);
             ScaffoldMessenger.of(context).showSnackBar(
-              StatusSnackbar(
-                  context: context,
-                  messageOk: "te",
-                  messageError: "messageError",
-                  status: status),
+              SnackBar(
+                content: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      status
+                          ? Icon(Icons.check, color: Colors.green)
+                          : Icon(Icons.close, color: Colors.red),
+                      Text(status ? "Success" : "Error"),
+                    ],
+                  ),
+                ),
+                duration: Duration(seconds: 3),
+                elevation: 10,
+              ),
             );
+            Navigator.of(context).pop();
           } else {
             final newId = await Provider.of<Workouts>(context, listen: false)
                 .addWorkout(workout);
@@ -308,6 +329,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                                     fontSize: 20),
                               ),
                               Container(
+                                key: forceRebuild,
                                 padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Row(
                                   children: [
@@ -343,6 +365,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                                 ),
                               ),
                               Container(
+                                key: forceRebuild1,
                                 padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Row(
                                   children: [

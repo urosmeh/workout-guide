@@ -132,6 +132,8 @@ class Workouts with ChangeNotifier {
           hours: durationMap["hours"],
           minutes: durationMap["minutes"],
         );
+        //Map<String, String> exerciseIds = workout["exerciseIds"] as Map<String, String>;
+        List<String> exerciseIds = List.castFrom(workout["exerciseIds"] as List ?? []); 
 
         workouts.add(
           Workout(
@@ -142,6 +144,7 @@ class Workouts with ChangeNotifier {
             workoutType: getWTFromString(workout["workoutType"]),
             equipment: workout["equipment"],
             approxDuration: duration,
+            exerciseIds: exerciseIds,
             // exercises: (workout["exercices"] as List<dynamic>).map(
             //   (exercise) => Exercise(
             //     title: exercise["title"],
@@ -218,27 +221,32 @@ class Workouts with ChangeNotifier {
     final workoutIndex = _workouts.indexWhere((item) => workoutId == item.id);
 
     if (workoutIndex >= 0) {
+      _workouts[workoutIndex] = workout;
       //return true;
-      var response = await http.patch(
-        url,
-        body: json.encode(
-          {
-            "title": workout.title,
-            "approxDuration": durationHelper(workout.approxDuration),
-            "dateTime": workout.dateTime.toIso8601String(),
-            "kcalBurned": workout.kcalBurned ?? 0,
-            "equipment": workout.equipment,
-            "workoutType": workout.workoutTypeString,
-            "difficulty": workout.difficultyString,
-            "isFinished":
-                workout.isFinished == null ? false : workout.isFinished,
-            "userCreated": userId,
-            "exerciseIds": workout.exerciseIds,
-          },
-        ),
-      );
-      //TODO: check response!!
-      return true;
+      try {
+        await http.patch(
+          url,
+          body: json.encode(
+            {
+              "title": workout.title,
+              "approxDuration": durationHelper(workout.approxDuration),
+              "dateTime": workout.dateTime.toIso8601String(),
+              "kcalBurned": workout.kcalBurned ?? 0,
+              "equipment": workout.equipment,
+              "workoutType": workout.workoutTypeString,
+              "difficulty": workout.difficultyString,
+              "isFinished":
+                  workout.isFinished == null ? false : workout.isFinished,
+              "userCreated": userId,
+              "exerciseIds": workout.exerciseIds,
+            },
+          ),
+        );
+        notifyListeners();
+        return true;
+      } catch (error) {
+        return false;
+      }
     } else {
       return false;
     }
