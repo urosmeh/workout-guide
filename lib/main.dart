@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
           create: (ctx) => Auth(),
         ),
         ChangeNotifierProxyProvider<Auth, Workouts>(
+          create: (_) => Workouts(null, null, []),
           update: (ctx, auth, previousWorkouts) => Workouts(
             auth.token,
             auth.userId,
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProxyProvider<Auth, Exercises>(
+          create: (_) => Exercises(null, null, []),
           update: (ctx, auth, previousExercises) => Exercises(
             auth.token,
             auth.userId,

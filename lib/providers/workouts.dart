@@ -133,7 +133,8 @@ class Workouts with ChangeNotifier {
           minutes: durationMap["minutes"],
         );
         //Map<String, String> exerciseIds = workout["exerciseIds"] as Map<String, String>;
-        List<String> exerciseIds = List.castFrom(workout["exerciseIds"] as List ?? []); 
+        List<String> exerciseIds =
+            List.castFrom(workout["exerciseIds"] as List ?? []);
 
         workouts.add(
           Workout(
@@ -145,19 +146,6 @@ class Workouts with ChangeNotifier {
             equipment: workout["equipment"],
             approxDuration: duration,
             exerciseIds: exerciseIds,
-            // exercises: (workout["exercices"] as List<dynamic>).map(
-            //   (exercise) => Exercise(
-            //     title: exercise["title"],
-            //     id: exercise["id"],
-            //     type: getETFromString(exercise["type"]),
-            //     description: exercise["description"],
-            //     duration: Duration(
-            //       hours: json.decode(exercise["duration"])["hours"],
-            //       minutes: json.decode(exercise["duration"])["minutes"],
-            //     ),
-            //     reps: exercise["reps"],
-            //   ),
-            // ),
           ),
         );
       });
@@ -187,6 +175,7 @@ class Workouts with ChangeNotifier {
     } else {
       workout.exerciseIds.add(exerciseId);
     }
+    notifyListeners();
 
     try {
       await http.patch(
@@ -252,7 +241,39 @@ class Workouts with ChangeNotifier {
     }
   }
 
-  // Future<void> removeExerciseById(String exId) {
+  Future<bool> patchWOExercises(String workoutId, List<String> newExercisesOrder) async {
+    final url =
+        Uri.parse("${FIREBASE_URL}workouts/$workoutId.json?auth=$authToken");
+    final workoutIndex = _workouts.indexWhere((item) => workoutId == item.id);
+    var workout = _workouts[workoutIndex];
 
-  // }
+    if (workoutIndex >= 0) {
+      try {
+        await http.patch(
+          url,
+          body: json.encode(
+            {
+              "title": workout.title,
+              "approxDuration": durationHelper(workout.approxDuration),
+              "dateTime": workout.dateTime.toIso8601String(),
+              "kcalBurned": workout.kcalBurned ?? 0,
+              "equipment": workout.equipment,
+              "workoutType": workout.workoutTypeString,
+              "difficulty": workout.difficultyString,
+              "isFinished":
+                  workout.isFinished == null ? false : workout.isFinished,
+              "userCreated": userId,
+              "exerciseIds": newExercisesOrder,
+            },
+          ),
+        );
+        notifyListeners();
+        return true;
+      } catch (error) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 }

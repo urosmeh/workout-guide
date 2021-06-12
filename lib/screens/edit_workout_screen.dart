@@ -6,7 +6,6 @@ import 'package:workout_guide/models/workout.dart';
 import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/workout_exercises_screen.dart';
 import 'package:workout_guide/widgets/dropdown_container.dart';
-import 'package:workout_guide/widgets/status_snackbar.dart';
 
 class EditWorkoutScreen extends StatefulWidget {
   static const route = "/edit-workout";
@@ -28,6 +27,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
   WorkoutType _workoutType;
   String _selWorkoutType;
   String _equipment;
+  List<String> _exerciseIds;
   String _title;
   final _form = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -42,13 +42,10 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
   void didChangeDependencies() {
     if (_isInit) {
       workoutId = ModalRoute.of(context).settings.arguments as String;
-      print(workoutId);
       if (workoutId != null) {
         _isUpdate = true;
         _editedObj = Provider.of<Workouts>(context, listen: false)
             .getWorkoutById(workoutId);
-        print("editedObj: ${_editedObj.title}");
-        print("editedObj d: ${_editedObj.approxDuration.toString()}");
         _title = _editedObj.title;
         _selDifficulty = _editedObj.difficultyString;
         _difficulty = _editedObj.difficulty;
@@ -74,6 +71,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
         _date = _editedObj.dateTime;
         _selWorkoutType = _editedObj.workoutTypeString;
         _workoutType = _editedObj.workoutType;
+        _exerciseIds = _editedObj.exerciseIds;
       }
     }
     _isInit = false;
@@ -218,9 +216,8 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
             equipment: _equipment,
             title: _title,
             workoutType: _workoutType,
+            exerciseIds: _exerciseIds,
           );
-          print(_isUpdate);
-          print("workoutid: ${workout.id}");
 
           if (_isUpdate) {
             //patch request
@@ -438,7 +435,7 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                                 alignment: AlignmentDirectional.centerEnd,
                                 child: TextButton(
                                   onPressed: () => _saveForm(context),
-                                  child: Text("Save and add exercises"),
+                                  child: Text(_isUpdate ? "Save" : "Save and add exercises"),
                                 ),
                               ),
                             ],

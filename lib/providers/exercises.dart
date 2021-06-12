@@ -54,7 +54,6 @@ class Exercises with ChangeNotifier, Helpers {
         return;
       }
 
-
       rData.forEach((id, exercise) {
         var durationMap = exercise["duration"] as Map<dynamic, dynamic>;
         var duration = Duration(
@@ -87,51 +86,20 @@ class Exercises with ChangeNotifier, Helpers {
   // }
 
   List<Exercise> getExercisesByIds(List<String> ids) {
-    return exercises.where((item) => ids.contains(item.id)).toList();
+    print("prov: $ids");
+    List<Exercise> tmp =
+        exercises.where((item) => ids.contains(item.id)).toList();
+
+    // tmp.sort((a, b) => ids.indexOf(a.) - ids.indexOf(b));
+    //var sortItem = tmp[0];
+    List<Exercise> sorted = [];
+    for (int i = 0; i < tmp.length; i++) {
+      sorted.add(tmp.firstWhere((item) => item.id == ids[i]));
+    }
+    return sorted;
   }
 
   Exercise getExerciseById(String id) {
     return exercises.firstWhere((exercise) => id == exercise.id);
   }
-
-  // Future<List<Exercise>> getExercisesByIds(List<String> ids) async {
-  //   final filterString = 'orderBy="userCreated"&equalTo="$userId"';
-  //   final url = Uri.parse(
-  //       "${FIREBASE_URL}exercises.json?auth=$authToken&$filterString");
-
-  //   try {
-  //     final response = await http.get(url);
-  //     final rData = json.decode(response.body) as Map<String, dynamic>;
-
-  //     if (rData == null) {
-  //       return [];
-  //     }
-
-  //     final List<Exercise> exercises = [];
-
-  //     rData.forEach((id, exercise) {
-  //       var durationMap = exercise["duration"] as Map<dynamic, dynamic>;
-  //       var duration = Duration(
-  //         hours: durationMap["hours"],
-  //         minutes: durationMap["minutes"],
-  //       );
-
-  //       exercises.add(
-  //         Exercise(
-  //           id: id,
-  //           title: exercise["title"],
-  //           description: exercise["description"],
-  //           type: Helpers.getETFromString(exercise["type"]),
-  //           reps: exercise["reps"],
-  //           duration: duration,
-  //         ),
-  //       );
-  //     });
-  //     notifyListeners();
-  //     return exercises.where((item) => ids.contains(item.id));
-  //     //return exercises;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
 }

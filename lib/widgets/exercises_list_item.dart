@@ -1,32 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:workout_guide/providers/workouts.dart';
 
 class ExercisesListItem extends StatelessWidget {
+  final workout;
   final id;
   final title;
   final description;
   final reps;
   final duration;
   final type;
+  final key;
 
   ExercisesListItem({
+    @required this.workout,
     @required this.id,
     @required this.title,
     this.description,
     this.reps,
     this.duration,
     this.type,
+    @required this.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: key,
       padding: EdgeInsets.only(top: 20),
       child: Dismissible(
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
-          //TODO: remove from workout only ?
-          // Provider<Workouts>.
-          print("on dismissed");
+          workout.removeExercise(this.id);
         },
         background: Container(
           alignment: Alignment.centerRight,

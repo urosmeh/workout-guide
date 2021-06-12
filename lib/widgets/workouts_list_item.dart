@@ -6,8 +6,6 @@ import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/screens/workout_exercises_screen.dart';
 
-import 'add_workout_exercise_modal.dart';
-
 enum ItemOptions { Start, Edit }
 
 class WorkoutsListItem extends StatelessWidget {
@@ -165,17 +163,17 @@ class WorkoutsListItem extends StatelessWidget {
                             ),
                           ),
                         ),
-                        OutlinedButton(
-                          onPressed: () {},
-                          child: Container(
-                            child: Row(
-                              children: [
-                                Icon(Icons.add),
-                                Text("Add new exercise"),
-                              ],
-                            ),
-                          ),
-                        ),
+                        // OutlinedButton(
+                        //   onPressed: () {},
+                        //   child: Container(
+                        //     child: Row(
+                        //       children: [
+                        //         Icon(Icons.add),
+                        //         Text("Add new exercise"),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ],

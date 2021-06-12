@@ -75,4 +75,9 @@ class Workout with ChangeNotifier {
     }
     notifyListeners();
   }
+  
+  void removeExercise(String exerciseId) {
+    this.exerciseIds.removeWhere((ex) => ex == exerciseId);
+    notifyListeners();
+  }
 }
