@@ -30,16 +30,15 @@ class Helpers {
   }
 
   static Map<String, int> durationHelper(Duration d) {
-    int mins = d.inMinutes;
-    int hoursOnly = mins ~/ 60;
-    int minsOnly = mins - hoursOnly * 60;
+    int h = d.inHours.remainder(24);
+    int m = d.inMinutes.remainder(60);
+    int s = d.inSeconds.remainder(60);
 
-    print("duration obj:  ${d.toString()}");
-    print("hours:  $hoursOnly");
-    print("hours:  $minsOnly");
+    return {"hours": h, "minutes": m, "seconds": s};
+  }
 
-    return {"minutes": minsOnly, "hours": hoursOnly};
+  static String durationString(Duration d) {
+    var dMap = durationHelper(d);
+    return "${dMap["hours"]}h ${dMap["minutes"]}m ${dMap["seconds"]}s";
   }
 }
-
-// TODO: add helpers

@@ -59,6 +59,7 @@ class Exercises with ChangeNotifier, Helpers {
         var duration = Duration(
           hours: durationMap["hours"],
           minutes: durationMap["minutes"],
+          seconds: durationMap["seconds"] ?? 0,
         );
 
         exercises.add(

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/models/workout.dart';
+import 'package:workout_guide/providers/exercises.dart';
 import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/screens/workout_exercises_screen.dart';
+import 'package:workout_guide/screens/workout_player_screen.dart';
 
 enum ItemOptions { Start, Edit }
 
@@ -35,6 +37,35 @@ class WorkoutsListItem extends StatelessWidget {
       return Colors.red;
     }
     return Colors.grey;
+  }
+
+  void onStartWorkout(BuildContext context, String workoutId) {
+    var exercises =
+        Provider.of<Exercises>(context, listen: false).getExercisesByIds(exerciseIds);
+
+    if (exercises == null || exercises.length <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 2),
+          content: Text("This workout has no exercises!"),
+        ),
+      );
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WorkoutPlayerScreen(
+          id: id,
+          title: title,
+          equipment: equipment,
+          duration: approxDurationString,
+          difficulty: difficulty,
+          exercises: exercises,
+        ),
+      ),
+    );
+    print("test");
   }
 
   void openWorkoutModal(BuildContext context, String workoutId) {
@@ -136,9 +167,9 @@ class WorkoutsListItem extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Column(
-                      children: [],
-                    ),
+                    // Column(
+                    //   children: [],
+                    // ),
                   ],
                 ),
               ),
@@ -152,7 +183,9 @@ class WorkoutsListItem extends StatelessWidget {
                       children: [
                         OutlinedButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamed(WorkoutExercisesScreen.route, arguments: workoutId);
+                            Navigator.of(context).pushNamed(
+                                WorkoutExercisesScreen.route,
+                                arguments: workoutId);
                           },
                           child: Container(
                             child: Row(
@@ -253,7 +286,7 @@ class WorkoutsListItem extends StatelessWidget {
             children: [
               IconButton(
                 icon: Icon(Icons.play_arrow),
-                onPressed: () {},
+                onPressed: () => onStartWorkout(context, id),
               ),
               PopupMenuButton(
                 child: Icon(Icons.more_vert),

@@ -20,10 +20,12 @@ class _EditExerciseState extends State<EditExercise> {
   String _description;
   int _hours = 0;
   int _mins = 0;
+  int _seconds = 0;
 
   Duration _duration = Duration(
     hours: 0,
     minutes: 0,
+    seconds: 0,
   );
   int reps = 0;
 
@@ -56,8 +58,6 @@ class _EditExerciseState extends State<EditExercise> {
       }
     }
 
-    
-
     Future<void> _saveForm(BuildContext context) async {
       setState(() {
         isLoading = true;
@@ -70,6 +70,7 @@ class _EditExerciseState extends State<EditExercise> {
         _duration = Duration(
           hours: _hours,
           minutes: _mins,
+          seconds: _seconds,
         );
 
         Exercise ex = Exercise(
@@ -217,21 +218,21 @@ class _EditExerciseState extends State<EditExercise> {
                                                 contentPadding:
                                                     EdgeInsets.all(10),
                                                 border: OutlineInputBorder(),
-                                                labelText: "hours",
+                                                labelText: "h",
                                               ),
                                               validator: (value) {
                                                 if (int.tryParse(value) ==
                                                     null) {
-                                                  return "Enter value (0 - 3)";
+                                                  return "0 - 3";
                                                 }
                                                 if (value.isEmpty) {
-                                                  return "Enter value (0 - 3)";
+                                                  return "0 - 3";
                                                 }
                                                 if (int.parse(value) < 0.0) {
-                                                  return "Enter value (0 - 3)";
+                                                  return "0 - 3";
                                                 }
                                                 if (int.parse(value) > 4) {
-                                                  return "Enter value (0 - 3)";
+                                                  return "0 - 3";
                                                 }
                                                 return null; //input is correct
                                               },
@@ -261,21 +262,21 @@ class _EditExerciseState extends State<EditExercise> {
                                                 contentPadding:
                                                     EdgeInsets.all(10),
                                                 border: OutlineInputBorder(),
-                                                labelText: "minutes",
+                                                labelText: "m",
                                               ),
                                               autovalidateMode:
                                                   AutovalidateMode.always,
                                               validator: (value) {
                                                 if (int.tryParse(value) ==
                                                     null) {
-                                                  return "Enter value (0-59)";
+                                                  return "0-59";
                                                 }
                                                 if (value.isEmpty) {
-                                                  return "Enter value (0-59)";
+                                                  return "0-59";
                                                 }
                                                 if (int.parse(value) < 0 ||
                                                     int.parse(value) >= 60) {
-                                                  return "Enter value (0-59)";
+                                                  return "0-59";
                                                 }
                                                 return null; //input is correct
                                               },
@@ -296,6 +297,48 @@ class _EditExerciseState extends State<EditExercise> {
                                           Spacer(
                                             flex: 1,
                                           ),
+                                          Flexible(
+                                            fit: FlexFit.loose,
+                                            flex: 5,
+                                            child: TextFormField(
+                                              decoration: InputDecoration(
+                                                isDense: true,
+                                                contentPadding:
+                                                    EdgeInsets.all(10),
+                                                border: OutlineInputBorder(),
+                                                labelText: "s",
+                                              ),
+                                              autovalidateMode:
+                                                  AutovalidateMode.always,
+                                              validator: (value) {
+                                                if (int.tryParse(value) ==
+                                                    null) {
+                                                  return "0-59";
+                                                }
+                                                if (value.isEmpty) {
+                                                  return "0-59";
+                                                }
+                                                if (int.parse(value) < 0 ||
+                                                    int.parse(value) >= 60) {
+                                                  return "0-59";
+                                                }
+                                                return null; //input is correct
+                                              },
+                                              onSaved: (value) =>
+                                                  _seconds = int.parse(value),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              autocorrect: false,
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              inputFormatters: <
+                                                  TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly
+                                              ],
+                                            ),
+                                          ),
+                                          Spacer(flex: 1),
                                         ],
                                       ),
                                     ),
