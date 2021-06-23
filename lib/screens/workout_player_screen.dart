@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -30,17 +29,13 @@ class WorkoutPlayerScreen extends StatefulWidget {
 
 class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
     with TickerProviderStateMixin {
-  var oneSec = Duration(seconds: 1);
   int counter = 0;
-  int currentTime = -1;
   AnimationController animController;
-  Timer currentTimeAdder;
-
-  Timer t;
+  var workoutFinished = false;
 
   String get timerString {
-    print(animController.duration);
-    print(animController.value);
+    //print(animController.duration);
+    //print(animController.value);
     Duration duration = animController.duration -
         animController.duration * animController.value;
     return Helpers.durationString(duration);
@@ -58,10 +53,11 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
     super.initState();
   }
 
-  void addCurrTime() {
-    currentTime =
-        currentTime == animController.duration.inSeconds ? -1 : currentTime + 1;
-  }
+  @override
+    void dispose() {
+      animController.dispose();
+      super.dispose();
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -73,137 +69,153 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
       ),
       body: Column(
         children: [
-          Container(
-            //padding: EdgeInsets.all(10),
-            child: Card(
-              elevation: 5,
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                children: [
-                  ListTile(
-                    // leading: Icon(Icons.arrow_drop_down_circle),
-                    title: Center(
-                      child: Text(
-                        widget.exercises[0].title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    subtitle: Text(
-                      widget.exercises[0].description,
-                      style: TextStyle(color: Colors.black.withOpacity(0.6)),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 150,
-                    padding: EdgeInsets.all(5),
+          !workoutFinished
+              ? Container(
+                  //padding: EdgeInsets.all(10),
+                  child: Card(
+                    elevation: 5,
+                    clipBehavior: Clip.antiAlias,
                     child: Column(
                       children: [
-                        Expanded(
-                          child: Align(
-                            alignment: FractionalOffset.center,
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: Stack(
-                                children: [
-                                  Positioned.fill(
-                                    child: AnimatedBuilder(
-                                      animation: animController,
-                                      builder: (
-                                        BuildContext context,
-                                        Widget child,
-                                      ) {
-                                        return CustomPaint(
-                                          painter: DurationProgressIndicator(
-                                            animation: animController,
-                                            backgroundColor: Colors.white,
-                                            barColor:
-                                                Theme.of(context).accentColor,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: FractionalOffset.center,
-                                    child: Container(
-                                      child: AnimatedBuilder(
-                                        animation: animController,
-                                        builder: (
-                                          BuildContext context,
-                                          Widget child,
-                                        ) {
-                                          return Text(
-                                            timerString,
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                        ListTile(
+                          // leading: Icon(Icons.arrow_drop_down_circle),
+                          title: Center(
+                            child: Text(
+                              widget.exercises[0].title,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
+                          subtitle: Text(
+                            widget.exercises[0].description,
+                            style:
+                                TextStyle(color: Colors.black.withOpacity(0.6)),
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 150,
+                          padding: EdgeInsets.all(5),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Align(
+                                  alignment: FractionalOffset.center,
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: AnimatedBuilder(
+                                            animation: animController,
+                                            builder: (
+                                              BuildContext context,
+                                              Widget child,
+                                            ) {
+                                              return CustomPaint(
+                                                painter:
+                                                    DurationProgressIndicator(
+                                                  animation: animController,
+                                                  backgroundColor: Colors.white,
+                                                  barColor: Theme.of(context)
+                                                      .accentColor,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        Align(
+                                          alignment: FractionalOffset.center,
+                                          child: Container(
+                                            child: AnimatedBuilder(
+                                              animation: animController,
+                                              builder: (
+                                                BuildContext context,
+                                                Widget child,
+                                              ) {
+                                                return Text(
+                                                  timerString,
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            widget.exercises[counter].duration.toString() +
+                                widget.exercises[counter].id,
+                            style:
+                                TextStyle(color: Colors.black.withOpacity(0.6)),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              color: Theme.of(context).accentColor,
+                              iconSize: 50,
+                              icon: Icon(
+                                animController.isAnimating
+                                    ? Icons.pause_circle_filled
+                                    : Icons.play_circle_fill,
+                              ),
+                              onPressed: () {
+                                setState(() {});
+                                if (animController.isAnimating) {
+                                  animController.stop();
+                                } else {
+                                  animController.forward(
+                                      from: animController.value);
+                                }
+                                //setState(() {});
+                              },
+                            ),
+                            IconButton(
+                              color: Theme.of(context).accentColor,
+                              iconSize: 50,
+                              icon: Icon(Icons.next_plan_sharp),
+                              onPressed: () async {
+                                // 0 => 1
+                                if (counter < widget.exercises.length - 1) {
+                                  setState(() {
+                                    counter++;
+                                  });
+                                  await animController.reverse(
+                                    from: animController.value,
+                                  );
+
+                                  animController.duration =
+                                      widget.exercises[counter].duration;
+                                  animController.forward(from: 0.0);
+                                } else {
+                                  setState(() {
+                                    workoutFinished = true;
+                                  });
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      widget.exercises[counter].duration.toString() +
-                          widget.exercises[counter].id,
-                      style: TextStyle(color: Colors.black.withOpacity(0.6)),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        color: Theme.of(context).accentColor,
-                        iconSize: 50,
-                        icon: Icon(
-                          animController.isAnimating
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                        ),
-                        onPressed: () {
-                          setState(() {});
-                          if (animController.isAnimating) {
-                            animController.stop();
-                          } else {
-                            animController.forward(from: animController.value);
-                          }
-                          //setState(() {});
-                        },
-                      ),
-                      IconButton(
-                        color: Theme.of(context).accentColor,
-                        iconSize: 50,
-                        icon: Icon(Icons.next_plan_sharp),
-                        onPressed: () async {
-                          setState(() {});
-                          counter ++;
-                          await animController.reverse(
-                            from: animController.value,
-                          );
-
-                          animController.duration =
-                              widget.exercises[counter].duration;
-                          animController.forward(from: 0.0);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+                )
+              : Center(
+                  child: Text("Finished"),
+                ),
         ],
       ),
     );

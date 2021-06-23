@@ -97,7 +97,6 @@ class _EditExerciseState extends State<EditExercise> {
           print("status: $status");
         }
 
-        //TODO: replace with own widget
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Container(
