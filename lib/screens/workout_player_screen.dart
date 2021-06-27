@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:workout_guide/models/exercise.dart';
 import 'package:workout_guide/models/helpers.dart';
 import 'package:workout_guide/widgets/duration_progress_indicator.dart';
+import 'package:workout_guide/widgets/remaining_exercises_widget.dart';
 
 class WorkoutPlayerScreen extends StatefulWidget {
   //const WorkoutPlayerScreen({Key key}) : super(key: key);
@@ -13,6 +16,7 @@ class WorkoutPlayerScreen extends StatefulWidget {
   final duration;
   final equipment;
   final difficulty;
+  var remaining;
 
   WorkoutPlayerScreen({
     @required this.id,
@@ -32,17 +36,26 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
   int counter = 0;
   AnimationController animController;
   var workoutFinished = false;
+  List<Exercise> remaining = [];
+  Timer t;
+  var paused = false;
 
   String get timerString {
-    //print(animController.duration);
-    //print(animController.value);
-    Duration duration = animController.duration -
-        animController.duration * animController.value;
-    return Helpers.durationString(duration);
+    if (widget.exercises[counter].type == ExerciseType.TimeBased) {
+      //widget.exercises[counter].type.toString());
+      Duration duration = animController.duration -
+          animController.duration * animController.value;
+      return Helpers.durationString(duration);
+    } else
+      return "${widget.exercises[counter].reps}x";
   }
 
   @override
   void initState() {
+    for (var i = 1; i < widget.exercises.length; i++) {
+      remaining.add(widget.exercises[i]);
+    }
+
     animController = AnimationController(
       vsync: this,
       reverseDuration: Duration(seconds: 1),
@@ -54,10 +67,10 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
   }
 
   @override
-    void dispose() {
-      animController.dispose();
-      super.dispose();
-    }
+  void dispose() {
+    animController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +84,6 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
         children: [
           !workoutFinished
               ? Container(
-                  //padding: EdgeInsets.all(10),
                   child: Card(
                     elevation: 5,
                     clipBehavior: Clip.antiAlias,
@@ -81,14 +93,14 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
                           // leading: Icon(Icons.arrow_drop_down_circle),
                           title: Center(
                             child: Text(
-                              widget.exercises[0].title,
+                              widget.exercises[counter].title,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                           subtitle: Text(
-                            widget.exercises[0].description,
+                            widget.exercises[counter].description,
                             style:
                                 TextStyle(color: Colors.black.withOpacity(0.6)),
                           ),
@@ -103,50 +115,50 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
                                 child: Align(
                                   alignment: FractionalOffset.center,
                                   child: AspectRatio(
-                                    aspectRatio: 1,
-                                    child: Stack(
-                                      children: [
-                                        Positioned.fill(
-                                          child: AnimatedBuilder(
-                                            animation: animController,
-                                            builder: (
-                                              BuildContext context,
-                                              Widget child,
-                                            ) {
-                                              return CustomPaint(
-                                                painter:
-                                                    DurationProgressIndicator(
-                                                  animation: animController,
-                                                  backgroundColor: Colors.white,
-                                                  barColor: Theme.of(context)
-                                                      .accentColor,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        Align(
-                                          alignment: FractionalOffset.center,
-                                          child: Container(
+                                      aspectRatio: 1,
+                                      child: Stack(
+                                        children: [
+                                          Positioned.fill(
                                             child: AnimatedBuilder(
                                               animation: animController,
                                               builder: (
                                                 BuildContext context,
                                                 Widget child,
                                               ) {
-                                                return Text(
-                                                  timerString,
-                                                  style: TextStyle(
-                                                    fontSize: 24,
+                                                return CustomPaint(
+                                                  painter:
+                                                      DurationProgressIndicator(
+                                                    animation: animController,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    barColor: Theme.of(context)
+                                                        .accentColor,
                                                   ),
                                                 );
                                               },
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                          Align(
+                                            alignment: FractionalOffset.center,
+                                            child: Container(
+                                              child: AnimatedBuilder(
+                                                animation: animController,
+                                                builder: (
+                                                  BuildContext context,
+                                                  Widget child,
+                                                ) {
+                                                  return Text(
+                                                    timerString,
+                                                    style: TextStyle(
+                                                      fontSize: 24,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
                                 ),
                               ),
                             ],
@@ -164,25 +176,53 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            IconButton(
-                              color: Theme.of(context).accentColor,
-                              iconSize: 50,
-                              icon: Icon(
-                                animController.isAnimating
-                                    ? Icons.pause_circle_filled
-                                    : Icons.play_circle_fill,
+                            if (widget.exercises[counter].type ==
+                                ExerciseType.TimeBased)
+                              IconButton(
+                                color: Theme.of(context).accentColor,
+                                iconSize: 50,
+                                icon: Icon(
+                                  animController.isAnimating
+                                      ? Icons.pause_circle_filled
+                                      : Icons.play_circle_fill,
+                                ),
+                                onPressed: () {
+                                  setState(() {});
+                                  if (animController.isAnimating) {
+                                    animController.stop();
+                                    paused = true;
+                                  } else {
+                                    animController
+                                        .forward(from: animController.value)
+                                        .then((value) async {
+                                      if (counter <
+                                          widget.exercises.length - 1) {
+                                        setState(() {
+                                          counter++;
+                                          remaining.removeAt(0);
+                                        });
+
+                                        await animController.reverse(
+                                          from: animController.value,
+                                        );
+
+                                        if (widget.exercises[counter].type ==
+                                            ExerciseType.TimeBased) {
+                                          animController.duration = widget
+                                              .exercises[counter].duration;
+                                          animController.forward(from: 0.0);
+                                        }
+                                      } else {
+                                        setState(() {
+                                          print("workout finished");
+                                          workoutFinished = true;
+                                        });
+                                      }
+                                    });
+                                  }
+                                  //setState(() {});
+                                },
                               ),
-                              onPressed: () {
-                                setState(() {});
-                                if (animController.isAnimating) {
-                                  animController.stop();
-                                } else {
-                                  animController.forward(
-                                      from: animController.value);
-                                }
-                                //setState(() {});
-                              },
-                            ),
                             IconButton(
                               color: Theme.of(context).accentColor,
                               iconSize: 50,
@@ -192,14 +232,45 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
                                 if (counter < widget.exercises.length - 1) {
                                   setState(() {
                                     counter++;
+                                    remaining.removeAt(0);
                                   });
+
                                   await animController.reverse(
                                     from: animController.value,
                                   );
 
-                                  animController.duration =
-                                      widget.exercises[counter].duration;
-                                  animController.forward(from: 0.0);
+                                  if (widget.exercises[counter].type ==
+                                      ExerciseType.TimeBased) {
+                                    animController.duration =
+                                        widget.exercises[counter].duration;
+                                    animController
+                                        .forward(from: 0.0)
+                                        .then((value) async {
+                                      if (counter <
+                                          widget.exercises.length - 1) {
+                                        setState(() {
+                                          counter++;
+                                          remaining.removeAt(0);
+                                        });
+
+                                        await animController.reverse(
+                                          from: animController.value,
+                                        );
+
+                                        if (widget.exercises[counter].type ==
+                                            ExerciseType.TimeBased) {
+                                          animController.duration = widget
+                                              .exercises[counter].duration;
+                                          animController.forward(from: 0.0);
+                                        }
+                                      } else {
+                                        setState(() {
+                                          print("workout finished");
+                                          workoutFinished = true;
+                                        });
+                                      }
+                                    });
+                                  }
                                 } else {
                                   setState(() {
                                     workoutFinished = true;
@@ -209,6 +280,7 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
                             ),
                           ],
                         ),
+                        RemainingList(remaining),
                       ],
                     ),
                   ),

@@ -1,4 +1,6 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/models/http_exception.dart';
 import 'package:workout_guide/providers/auth.dart';
@@ -11,9 +13,33 @@ enum AuthType {
 
 class AuthScreen extends StatelessWidget {
   static const route = "/auth";
+  // final FlutterLocalNotificationsPlugin notificationPlugin;
+
+  // AuthScreen(this.notificationPlugin);
+  AuthScreen();
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
+    // print("notif");
+    // AndroidNotificationChannel channel = AndroidNotificationChannel(
+    //     'high_importance_channel', // id
+    //     'High Importance Notifications', // title
+    //     'This channel is used for important notifications.', // description
+    //     importance: Importance.high,
+    //     playSound: true);
+    // notificationPlugin.show(
+    //   0,
+    //   "test",
+    //   "test message",
+    //   NotificationDetails(
+    //     android: AndroidNotificationDetails(
+    //       channel.id,
+    //       channel.name,
+    //       channel.description,
+    //     ),
+    //   ),
+    // );
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -129,6 +155,7 @@ class _FormContainerState extends State<FormContainer>
 
   void _submitForm() async {
     if (!_formKey.currentState.validate()) {
+      //FirebaseMessaging.instance
       return;
     }
 
@@ -274,7 +301,12 @@ class _FormContainerState extends State<FormContainer>
                           labelStyle: TextStyle(color: Colors.white70),
                           icon: Padding(
                             padding: const EdgeInsets.only(left: 5),
-                            child: Icon(icon, color: icon == Icons.check_sharp ? Colors.green : Colors.red,),
+                            child: Icon(
+                              icon,
+                              color: icon == Icons.check_sharp
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
                           ),
                           border: InputBorder.none,
                         ),

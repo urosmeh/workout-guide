@@ -67,7 +67,7 @@ class Exercises with ChangeNotifier, Helpers {
             id: id,
             title: exercise["title"],
             description: exercise["description"],
-            type: Helpers.getETFromString(exercise["type"]),
+            type: Helpers.getETFromString(exercise["exerciseType"]),
             reps: exercise["reps"],
             duration: duration,
           ),
