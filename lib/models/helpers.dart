@@ -41,4 +41,10 @@ class Helpers {
     var dMap = durationHelper(d);
     return "${dMap["hours"]}h ${dMap["minutes"]}m ${dMap["seconds"]}s";
   }
+
+  static int dayDifference(DateTime a, DateTime b) {
+    a = DateTime(a.year, a.month, a.day);
+    b = DateTime(b.year, b.month, b.day);
+    return (b.difference(a).inHours / 24).round();
+  }
 }

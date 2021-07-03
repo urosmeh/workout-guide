@@ -81,9 +81,13 @@ class Workouts with ChangeNotifier {
     workout.id = id;
 
     _workouts.add(workout);
+    _sortWorkouts();
     notifyListeners();
-
     return id;
+  }
+
+  void _sortWorkouts() {
+    _workouts.sort((a, b) => a.dateTime.compareTo(b.dateTime));
   }
 
   Future<void> removeWorkout(String id) async {
@@ -143,9 +147,9 @@ class Workouts with ChangeNotifier {
             exerciseIds: exerciseIds,
           ),
         );
-        workouts.sort((a, b) => a.dateTime.compareTo(b.dateTime));
       });
       _workouts = workouts;
+      _sortWorkouts();
       notifyListeners();
     } catch (error) {
       throw error;
@@ -236,7 +240,8 @@ class Workouts with ChangeNotifier {
     }
   }
 
-  Future<bool> patchWOExercises(String workoutId, List<String> newExercisesOrder) async {
+  Future<bool> patchWOExercises(
+      String workoutId, List<String> newExercisesOrder) async {
     final url =
         Uri.parse("${FIREBASE_URL}workouts/$workoutId.json?auth=$authToken");
     final workoutIndex = _workouts.indexWhere((item) => workoutId == item.id);

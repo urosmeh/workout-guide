@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:workout_guide/models/helpers.dart';
 import 'package:workout_guide/widgets/workouts_list_item.dart';
-
 
 class WorkoutsList extends StatelessWidget {
   final id;
@@ -11,6 +11,8 @@ class WorkoutsList extends StatelessWidget {
   final equipment;
   final approxDurationString;
   final exerciseIds;
+  final index;
+  final DateTime prevDate;
 
   WorkoutsList({
     @required this.id,
@@ -20,30 +22,37 @@ class WorkoutsList extends StatelessWidget {
     @required this.equipment,
     @required this.approxDurationString,
     @required this.exerciseIds,
+    @required this.index,
+    @required this.prevDate,
   });
+
+  
 
   @override
   Widget build(BuildContext context) {
+    print(datetime.toString());
     return Container(
-      padding: EdgeInsets.only(top: 20),
+      padding: EdgeInsets.only(top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              DateFormat("EEEE - HH:mm").format(datetime),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
+          if (index == 0 || Helpers.dayDifference(prevDate, datetime) != 0)
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: index == 0 ? 10 : 30),
+              child: Text(
+                DateFormat("EEEE, d. MMMM y").format(datetime),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
               ),
             ),
-          ),
           WorkoutsListItem(
             id: id,
             title: title,
             approxDurationString: approxDurationString,
+            dateTime: datetime,
             difficulty: difficulty,
             equipment: equipment,
             exerciseIds: exerciseIds,

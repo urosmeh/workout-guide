@@ -15,6 +15,7 @@ class WorkoutsListItem extends StatelessWidget {
   final title;
   final equipment;
   final approxDurationString;
+  final dateTime;
   final difficulty;
   final exerciseIds;
 
@@ -23,12 +24,12 @@ class WorkoutsListItem extends StatelessWidget {
     this.title,
     this.equipment,
     this.approxDurationString,
+    this.dateTime,
     this.difficulty,
     this.exerciseIds,
   });
 
   MaterialColor difficultyColor(Difficulty difficulty) {
-    print("getDiff");
     if (difficulty == Difficulty.Easy) {
       return Colors.green;
     } else if (difficulty == Difficulty.Medium) {
@@ -40,8 +41,8 @@ class WorkoutsListItem extends StatelessWidget {
   }
 
   void onStartWorkout(BuildContext context, String workoutId) {
-    var exercises =
-        Provider.of<Exercises>(context, listen: false).getExercisesByIds(exerciseIds);
+    var exercises = Provider.of<Exercises>(context, listen: false)
+        .getExercisesByIds(exerciseIds);
 
     if (exercises == null || exercises.length <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +66,6 @@ class WorkoutsListItem extends StatelessWidget {
         ),
       ),
     );
-    print("test");
   }
 
   void openWorkoutModal(BuildContext context, String workoutId) {
@@ -267,7 +267,7 @@ class WorkoutsListItem extends StatelessWidget {
           onLongPress: () => openWorkoutModal(context, id),
           onTap: () => Navigator.of(context)
               .pushNamed(EditWorkoutScreen.route, arguments: id),
-          title: Text(title),
+          title: Text(title, style: TextStyle(fontWeight: FontWeight.bold),),
           leading: Icon(
             Icons.circle,
             color: difficultyColor(difficulty),
@@ -277,7 +277,23 @@ class WorkoutsListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(equipment),
-                Text(approxDurationString),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      WidgetSpan(
+                        child: Icon(Icons.av_timer, size: 15,),
+                      ),
+                      TextSpan(
+                        text: DateFormat("HH:mm").format(dateTime).toString(),
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+                // Text(
+                //   DateFormat("HH:mm").format(dateTime),
+                //   style: Text,
+                // ),
               ],
             ),
           ),
@@ -285,24 +301,16 @@ class WorkoutsListItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.play_arrow),
+                icon: Icon(Icons.play_arrow,
+                    color: Theme.of(context).primaryColor),
                 onPressed: () => onStartWorkout(context, id),
               ),
-              PopupMenuButton(
-                child: Icon(Icons.more_vert),
-                itemBuilder: (_) => [
-                  PopupMenuItem(
-                    child: Text("Edit"),
-                    value: ItemOptions.Edit,
-                  ),
-                  PopupMenuItem(
-                    child: Text("Start"),
-                    value: ItemOptions.Start,
-                  ),
-                ],
-                onSelected: (ItemOptions selected) {
-                  //open edit/start screen
-                },
+              IconButton(
+                icon: Icon(
+                  Icons.search,
+                  color: Colors.pink,
+                ),
+                onPressed: () => openWorkoutModal(context, id),
               ),
             ],
           ),

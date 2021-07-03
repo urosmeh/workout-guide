@@ -127,6 +127,7 @@ class _MyAppState extends State<MyApp> {
       child: Consumer<Auth>(
         builder: (ctx, auth, child) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: "Workout guide",
             theme: ThemeData(
               primarySwatch: Colors.pink,
