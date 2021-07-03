@@ -83,18 +83,11 @@ class _EditExerciseState extends State<EditExercise> {
 
         final exerciseId = await Provider.of<Exercises>(context, listen: false)
             .addExercise(ex);
-        print("---------------------------------");
-        print("exerciseId: $exerciseId");
-        print("workoutId: ${widget.workoutId}");
-        print("---------------------------------");
+
         bool status = true;
         if (exerciseId != null) {
-          //workout.addExercise(exerciseId);
-          //print("workout ${workout.title}: ${workout.exerciseIds.length}");
-
           status = await Provider.of<Workouts>(context, listen: false)
               .addExerciseToWorkout(widget.workoutId, exerciseId);
-          print("status: $status");
         }
 
         ScaffoldMessenger.of(context).showSnackBar(

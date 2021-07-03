@@ -78,7 +78,6 @@ class _MyAppState extends State<MyApp> {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage msg) {
-      print("Test");
       RemoteNotification notification = msg.notification;
       AndroidNotification androidNotification = msg.notification?.android;
       if (notification != null && androidNotification != null) {

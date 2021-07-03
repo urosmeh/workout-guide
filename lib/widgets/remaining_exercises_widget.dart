@@ -17,7 +17,7 @@ class RemainingList extends StatelessWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: remaining.length,
-        itemBuilder: (_, index) => Container(
+        itemBuilder: (ctx, index) => Container(
           width: 150,
           height: 150,
           child: Card(

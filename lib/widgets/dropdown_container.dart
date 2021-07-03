@@ -22,7 +22,6 @@ class DropdownContainer extends StatelessWidget {
         validator: (value) => value == null ? "Value required" : null,
         //onSaved: ,
         onChanged: (String val) {
-          print(val);
           onDropdownSelect(val);
         },
         icon: Icon(Icons.arrow_drop_down_sharp, color: Colors.pink,),

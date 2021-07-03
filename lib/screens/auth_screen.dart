@@ -1,6 +1,4 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:workout_guide/models/http_exception.dart';
 import 'package:workout_guide/providers/auth.dart';
@@ -13,33 +11,11 @@ enum AuthType {
 
 class AuthScreen extends StatelessWidget {
   static const route = "/auth";
-  // final FlutterLocalNotificationsPlugin notificationPlugin;
-
-  // AuthScreen(this.notificationPlugin);
   AuthScreen();
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    // print("notif");
-    // AndroidNotificationChannel channel = AndroidNotificationChannel(
-    //     'high_importance_channel', // id
-    //     'High Importance Notifications', // title
-    //     'This channel is used for important notifications.', // description
-    //     importance: Importance.high,
-    //     playSound: true);
-    // notificationPlugin.show(
-    //   0,
-    //   "test",
-    //   "test message",
-    //   NotificationDetails(
-    //     android: AndroidNotificationDetails(
-    //       channel.id,
-    //       channel.name,
-    //       channel.description,
-    //     ),
-    //   ),
-    // );
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -110,6 +86,7 @@ class _FormContainerState extends State<FormContainer>
   };
 
   var icon = Icons.close;
+  var _isLoading = false;
 
   final _passwordController = TextEditingController();
 
@@ -154,6 +131,9 @@ class _FormContainerState extends State<FormContainer>
   }
 
   void _submitForm() async {
+    setState(() {
+      _isLoading = true;
+    });
     if (!_formKey.currentState.validate()) {
       //FirebaseMessaging.instance
       return;
@@ -190,7 +170,6 @@ class _FormContainerState extends State<FormContainer>
 
       _showErrorDialog(errMsg);
     } catch (error) {
-      print(error);
       const errMsg = "Couldn't authenticate";
       _showErrorDialog(errMsg);
     }
@@ -242,7 +221,7 @@ class _FormContainerState extends State<FormContainer>
             constraints: BoxConstraints(
               minHeight: _authType == AuthType.Login ? 100 : 20,
             ),
-            child: Column(
+            child: !_isLoading ? Column(
               children: [
                 TextFormField(
                   validator: (value) {
@@ -345,7 +324,7 @@ class _FormContainerState extends State<FormContainer>
                       : "Use existing account"),
                 ),
               ],
-            ),
+            ) : Center(child: CircularProgressIndicator()),
           ),
         ),
       ),

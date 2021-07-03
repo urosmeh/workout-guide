@@ -87,7 +87,6 @@ class Exercises with ChangeNotifier, Helpers {
   // }
 
   List<Exercise> getExercisesByIds(List<String> ids) {
-    print("prov: $ids");
     List<Exercise> tmp =
         exercises.where((item) => ids.contains(item.id)).toList();
 

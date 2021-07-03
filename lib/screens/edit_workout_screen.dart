@@ -352,7 +352,6 @@ class _EditWorkoutScreenState extends State<EditWorkoutScreen> {
                                         max: 3,
                                         onChanged: (val) {
                                           setState(() {
-                                            print("val: $val");
                                             _approxHours = val;
                                           });
                                         },

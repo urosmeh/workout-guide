@@ -8,12 +8,7 @@ class AddWorkoutExerciseModal extends StatelessWidget {
   //AddWorkoutExerciseModal();
 
   Widget build(BuildContext context) {
-    print("add_workout_exercise_modal $workoutId");
-    //final workoutId = ModalRoute.of(context).settings.arguments as String;
-    //print("workoutId from args: $workoutId");
     final mqObj = MediaQuery.of(context).size;
-    print("workout id : $workoutId");
-
     return Container(
       child: Scaffold(
         backgroundColor: Colors.black.withOpacity(.4),

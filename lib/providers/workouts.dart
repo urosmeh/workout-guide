@@ -43,11 +43,6 @@ class Workouts with ChangeNotifier {
     int mins = d.inMinutes;
     int hoursOnly = mins ~/ 60;
     int minsOnly = mins - hoursOnly * 60;
-
-    print("duration obj:  ${d.toString()}");
-    print("hours:  $hoursOnly");
-    print("hours:  $minsOnly");
-
     return {"minutes": minsOnly, "hours": hoursOnly};
   }
 
@@ -148,6 +143,7 @@ class Workouts with ChangeNotifier {
             exerciseIds: exerciseIds,
           ),
         );
+        workouts.sort((a, b) => a.dateTime.compareTo(b.dateTime));
       });
       _workouts = workouts;
       notifyListeners();
@@ -196,7 +192,6 @@ class Workouts with ChangeNotifier {
         ),
       );
     } catch (error) {
-      print(error);
       throw error;
     }
 

@@ -38,7 +38,6 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
       if (workoutId != null) {
         workout = Provider.of<Workouts>(context, listen: false)
             .getWorkoutById(workoutId);
-        //print(workout.exerciseIds);
         await Provider.of<Exercises>(context, listen: false)
             .getAndSetExercises();
         if (workout.exerciseIds != null && workout.exerciseIds.length >= 0) {
@@ -83,10 +82,8 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
                 child: Consumer<Exercises>(
                   //child: Text("asd"),
                   builder: (ctx, exercisesData, child) {
-                    print("ex builder m");
                     if (workout.exerciseIds != null &&
                         workout.exerciseIds.length > 0) {
-                      //print(workout.exerciseIds);
                       exercises = exercisesData
                               .getExercisesByIds(workout.exerciseIds) ??
                           [];
@@ -128,7 +125,9 @@ class _WorkoutExercisesScreenState extends State<WorkoutExercisesScreen> {
                                           Container(
                                             height: 10,
                                             width: 10,
-                                            child: CircularProgressIndicator(strokeWidth: 2,),
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
                                           )
                                         ],
                                       ),
