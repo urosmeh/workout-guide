@@ -26,11 +26,8 @@ class WorkoutsList extends StatelessWidget {
     @required this.prevDate,
   });
 
-  
-
   @override
   Widget build(BuildContext context) {
-    print(datetime.toString());
     return Container(
       padding: EdgeInsets.only(top: 0),
       child: Column(

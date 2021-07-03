@@ -19,6 +19,14 @@ class Workouts with ChangeNotifier {
     return _workouts;
   }
 
+  List<Workout> get finishedWorkouts {
+    return _workouts.where((item) => item.isFinished).toList();
+  }
+
+  List<Workout> get upcomingWorkouts {
+    return _workouts.where((item) => !item.isFinished).toList();
+  }
+
   Difficulty getDiffFromString(String diff) {
     if (diff == "Easy") {
       return Difficulty.Easy;
@@ -145,6 +153,7 @@ class Workouts with ChangeNotifier {
             equipment: workout["equipment"],
             approxDuration: duration,
             exerciseIds: exerciseIds,
+            isFinished: workout["isFinished"],
           ),
         );
       });

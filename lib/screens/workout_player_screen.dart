@@ -133,7 +133,8 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (widget.exercises[counter].type == ExerciseType.TimeBased)
+        if (widget.exercises[counter].type == ExerciseType.TimeBased ||
+            counter == 0)
           IconButton(
             color: Theme.of(context).accentColor,
             iconSize: 50,
@@ -156,34 +157,36 @@ class _WorkoutPlayerScreenState extends State<WorkoutPlayerScreen>
                     tCount++;
                   });
                 }
-                animController
-                    .forward(from: animController.value)
-                    .then((value) async {
-                  if (counter < widget.exercises.length - 1) {
-                    setState(() {
-                      counter++;
-                      _removeItem();
+                if (widget.exercises[counter].type == ExerciseType.TimeBased) {
+                  animController
+                      .forward(from: animController.value)
+                      .then((value) async {
+                    if (counter < widget.exercises.length - 1) {
+                      setState(() {
+                        counter++;
+                        _removeItem();
 
-                      //remaining.removeAt(0);
-                    });
+                        //remaining.removeAt(0);
+                      });
 
-                    await animController.reverse(
-                      from: animController.value,
-                    );
+                      await animController.reverse(
+                        from: animController.value,
+                      );
 
-                    if (widget.exercises[counter].type ==
-                        ExerciseType.TimeBased) {
-                      animController.duration =
-                          widget.exercises[counter].duration;
-                      animController.forward(from: 0.0);
+                      if (widget.exercises[counter].type ==
+                          ExerciseType.TimeBased) {
+                        animController.duration =
+                            widget.exercises[counter].duration;
+                        animController.forward(from: 0.0);
+                      }
+                    } else {
+                      setState(() {
+                        tDur.cancel();
+                        workoutFinished = true;
+                      });
                     }
-                  } else {
-                    setState(() {
-                      tDur.cancel();
-                      workoutFinished = true;
-                    });
-                  }
-                });
+                  });
+                }
               }
               //setState(() {});
             },

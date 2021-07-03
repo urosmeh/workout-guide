@@ -5,13 +5,19 @@ import 'package:workout_guide/providers/workouts.dart';
 import 'package:workout_guide/screens/edit_workout_screen.dart';
 import 'package:workout_guide/widgets/workouts_list.dart';
 
-class WorkoutsScreen extends StatelessWidget {
+class WorkoutsScreen extends StatefulWidget {
   static const route = "/workouts";
 
+  @override
+  _WorkoutsScreenState createState() => _WorkoutsScreenState();
+}
+class _WorkoutsScreenState extends State<WorkoutsScreen> {
   Future<void> _refreshList(BuildContext context) async {
     await Provider.of<Workouts>(context, listen: false).getAndSetWorkouts();
     await Provider.of<Exercises>(context, listen: false).getAndSetExercises();
   }
+
+  var _showAll = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,32 +41,84 @@ class WorkoutsScreen extends StatelessWidget {
                     return CustomScrollView(
                       slivers: [
                         SliverAppBar(
-                          title: Text("Upcoming"),
-                          centerTitle: true,
+                          actions: [
+                            Row(
+                              children: [
+                                Text(
+                                  "All",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Switch(
+                                  value: _showAll,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _showAll = val;
+                                    });
+                                  },
+                                ),
+                              ],
+                            )
+                          ],
+                          title: Text(_showAll ? "All workouts" : "Upcoming"),
+                          //centerTitle: true,
                           floating: true,
                         ),
-                        if (workoutsData.workouts.length >
-                            0) //move on sliver list
+                        if (workoutsData.workouts.length > 0 && _showAll)
                           SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) => WorkoutsList(
-                                id: workoutsData.workouts[index].id,
-                                title: workoutsData.workouts[index].title,
-                                datetime: workoutsData.workouts[index].dateTime,
-                                approxDurationString: workoutsData
-                                    .workouts[index].approxDurationString,
-                                difficulty:
-                                    workoutsData.workouts[index].difficulty,
-                                equipment:
-                                    workoutsData.workouts[index].equipment,
-                                exerciseIds: workoutsData.workouts[index].exerciseIds,
-                                index: index,
-                                prevDate: index > 0 ? workoutsData.workouts[index - 1].dateTime : null
-                              ),
+                                  id: workoutsData.workouts[index].id,
+                                  title: workoutsData.workouts[index].title,
+                                  datetime:
+                                      workoutsData.workouts[index].dateTime,
+                                  approxDurationString: workoutsData
+                                      .workouts[index].approxDurationString,
+                                  difficulty:
+                                      workoutsData.workouts[index].difficulty,
+                                  equipment:
+                                      workoutsData.workouts[index].equipment,
+                                  exerciseIds:
+                                      workoutsData.workouts[index].exerciseIds,
+                                  index: index,
+                                  prevDate: index > 0
+                                      ? workoutsData
+                                          .workouts[index - 1].dateTime
+                                      : null),
                               childCount: workoutsData.workouts.length,
                             ),
                           ),
-                        if (workoutsData.workouts.length == 0)
+                        if (workoutsData.upcomingWorkouts.length > 0 &&
+                            !_showAll) //move on sliver list
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => WorkoutsList(
+                                  id: workoutsData.upcomingWorkouts[index].id,
+                                  title: workoutsData
+                                      .upcomingWorkouts[index].title,
+                                  datetime: workoutsData
+                                      .upcomingWorkouts[index].dateTime,
+                                  approxDurationString: workoutsData
+                                      .upcomingWorkouts[index]
+                                      .approxDurationString,
+                                  difficulty: workoutsData
+                                      .upcomingWorkouts[index].difficulty,
+                                  equipment: workoutsData
+                                      .upcomingWorkouts[index].equipment,
+                                  exerciseIds: workoutsData
+                                      .upcomingWorkouts[index].exerciseIds,
+                                  index: index,
+                                  prevDate: index > 0
+                                      ? workoutsData
+                                          .upcomingWorkouts[index - 1].dateTime
+                                      : null),
+                              childCount: workoutsData.upcomingWorkouts.length,
+                            ),
+                          ),
+                        if (workoutsData.upcomingWorkouts.length == 0 &&
+                            !_showAll)
                           SliverList(
                             delegate: SliverChildListDelegate(
                               [
